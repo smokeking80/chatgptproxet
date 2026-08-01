@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PoSečem — péče o zahradu v Brně a okolí</title>
+<meta name="description" content="PoSečem: sekání trávy, mulčování, zavlažovací systémy a odvoz zahradního odpadu v Brně a okolí. Zjistěte, jaký plán péče vaše zahrada potřebuje.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --obsidian:#15150F;
+  --obsidian-2:#1D1D15;
+  --cream:#F3EEE1;
+  --cream-2:#EAE3D0;
+  --smoke:#8C8877;
+  --gold:#B68A3F;
+  --gold-light:#D2AC63;
+  --burgundy:#7B2E2E;
+  --burgundy-light:#9B4444;
+  --moss:#4A5638;
+  --moss-dark:#2E3624;
+
+  --serif:'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --grotesk:'Inter', -apple-system, sans-serif;
+
+  --ease: cubic-bezier(.22,1,.36,1);
+  --rule: 1px solid rgba(21,21,15,0.12);
+  --rule-dark: 1px solid rgba(243,238,225,0.14);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+}
+body{
+  font-family:var(--grotesk);
+  background:var(--cream);
+  color:var(--obsidian);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img,svg{display:block;max-width:100%;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit;}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;}
+
+.eyebrow{
+  font-family:var(--grotesk);
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--gold);
+}
+.eyebrow.on-cream{color:var(--burgundy);}
+
+.wrap{
+  max-width:1400px;
+  margin:0 auto;
+  padding:0 6vw;
+}
+
+.grid12{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  gap:1.4vw;
+}
+
+h1,h2,h3{font-family:var(--serif);font-weight:500;letter-spacing:-0.01em;}
+
+/* Focus visibility across the page */
+a:focus-visible, button:focus-visible, [tabindex]:focus-visible{
+  outline:2px solid var(--gold);
+  outline-offset:4px;
+  border-radius:2px;
+}
+
+/* ============ NAV ============ */
+.nav{
+  position:fixed;
+  top:0;left:0;right:0;
+  z-index:100;
+  padding:22px 6vw;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  mix-blend-mode:difference;
+}
+.nav-mark{
+  font-family:var(--serif);
+  font-size:20px;
+  font-weight:500;
+  color:var(--cream);
+  letter-spacing:0.01em;
+}
+.nav-links{
+  display:flex;
+  gap:2.4vw;
+  list-style:none;
+}
+.nav-links a{
+  font-size:12px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--cream);
+  font-weight:600;
+  position:relative;
+  padding-bottom:3px;
+}
+.nav-links a::after{
+  content:'';
+  position:absolute;left:0;bottom:0;
+  width:0;height:1px;
+  background:var(--cream);
+  transition:width .35s var(--ease);
+}
+.nav-links a:hover::after,.nav-links a:focus-visible::after{width:100%;}
+.nav-cta{
+  font-size:12px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  font-weight:700;
+  color:var(--cream);
+  border:1px solid var(--cream);
+  padding:9px 18px;
+  border-radius:999px;
+}
+@media (max-width:760px){
+  .nav-links{display:none;}
+}
+
+/* ============ HERO ============ */
+.hero{
+  position:relative;
+  height:220vh;
+  background:var(--obsidian);
+  color:var(--cream);
+}
+.hero-sticky{
+  position:sticky;
+  top:0;
+  height:100vh;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+}
+.hero-bg-texture{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(182,138,63,0.12), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 15% 100%, rgba(123,46,46,0.16), transparent 60%);
+  pointer-events:none;
+}
+.ribbon-layer{
+  position:absolute;
+  left:0; top:38%;
+  width:100%;
+  height:34vh;
+  display:flex;
+  align-items:center;
+  gap:1.4vw;
+  will-change:transform;
+  transform:translateX(8vw);
+}
+.ribbon-frame{
+  flex:0 0 auto;
+  width:15vw;
+  min-width:150px;
+  height:100%;
+  border-radius:2px;
+  overflow:hidden;
+  position:relative;
+  box-shadow:0 30px 60px -20px rgba(0,0,0,0.6);
+  transform:translateY(var(--arc,0));
+}
+.ribbon-frame img{width:100%;height:100%;object-fit:cover;}
+.ribbon-frame::after{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(180deg, rgba(21,21,15,0) 55%, rgba(21,21,15,0.55) 100%);
+}
+.portrait-layer{
+  position:absolute;
+  left:50%;
+  bottom:0;
+  transform:translateX(-50%);
+  width:min(46vw,560px);
+  height:82vh;
+  will-change:transform;
+  z-index:5;
+  pointer-events:none;
+}
+.portrait-cutout{
+  width:100%;height:100%;
+}
+.hero-copy{
+  position:relative;
+  z-index:6;
+  padding:0 6vw 8vh;
+  max-width:760px;
+}
+.hero-copy .eyebrow{margin-bottom:18px;display:block;}
+.hero-title{
+  font-size:clamp(34px,5.4vw,74px);
+  line-height:1.02;
+  color:var(--cream);
+  margin-bottom:22px;
+}
+.hero-title em{
+  font-style:italic;
+  color:var(--gold-light);
+}
+.hero-sub{
+  font-size:clamp(15px,1.4vw,18px);
+  color:rgba(243,238,225,0.78);
+  max-width:520px;
+  margin-bottom:34px;
+}
+.hero-actions{
+  display:flex;
+  gap:16px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.btn-primary{
+  background:var(--gold);
+  color:var(--obsidian);
+  font-weight:700;
+  font-size:13px;
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+  padding:16px 30px;
+  border-radius:999px;
+  transition:transform .3s var(--ease), background .3s var(--ease);
+  display:inline-block;
+}
+.btn-primary:hover{background:var(--gold-light);transform:translateY(-2px);}
+.btn-ghost{
+  font-size:13px;
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+  font-weight:600;
+  color:var(--cream);
+  border-bottom:1px solid rgba(243,238,225,0.5);
+  padding-bottom:3px;
+  transition:border-color .3s var(--ease);
+}
+.btn-ghost:hover{border-color:var(--cream);}
+.hero-role{
+  position:relative;
+  z-index:6;
+  padding:0 6vw 6vh;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  opacity:0;
+  will-change:opacity, transform;
+  transform:translateY(14px);
+}
+.hero-role-name{
+  font-family:var(--serif);
+  font-size:15px;
+  color:var(--cream);
+}
+.hero-role-title{
+  font-size:11px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--smoke);
+}
+.scroll-hint{
+  font-size:10px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--smoke);
+  writing-mode:vertical-rl;
+}
+
+@media (max-width:760px){
+  .hero{height:auto;min-height:100vh;}
+  .hero-sticky{position:relative;height:auto;min-height:100vh;padding-top:90px;}
+  .ribbon-layer{display:none;}
+  .portrait-layer{position:relative;left:0;transform:none;width:100%;height:44vh;margin-top:20px;}
+  .hero-copy{padding:6vh 6vw 4vh;}
+  .hero-role{position:relative;padding:0 6vw 5vh;opacity:1;transform:none;}
+}
+
+/* ============ SECTION SCAFFOLD ============ */
+section{position:relative;}
+.section-pad{padding:14vh 0;}
+.section-pad-sm{padding:9vh 0;}
+.on-dark{background:var(--obsidian);color:var(--cream);}
+.on-cream{background:var(--cream);color:var(--obsidian);}
+.rule-top{border-top:var(--rule);}
+.on-dark .rule-top{border-top:var(--rule-dark);}
+
+.section-head{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  gap:1.4vw;
+  margin-bottom:6vh;
+  align-items:end;
+}
+.section-head .eyebrow{grid-column:1/4;}
+.section-head h2{
+  grid-column:1/9;
+  font-size:clamp(28px,3.4vw,46px);
+  line-height:1.08;
+}
+.section-head p{
+  grid-column:9/13;
+  font-size:14px;
+  color:var(--smoke);
+  padding-bottom:4px;
+}
+@media (max-width:900px){
+  .section-head, .section-head .eyebrow, .section-head h2, .section-head p{
+    grid-column:1/-1;
+  }
+  .section-head p{margin-top:14px;}
+}
+
+/* ============ PERSPECTIVE CARD STACK (signature interaction) ============ */
+.stack-section{
+  background:var(--obsidian);
+  color:var(--cream);
+  padding:14vh 0 16vh;
+}
+.stack-intro{
+  max-width:640px;
+  margin:0 auto 7vh;
+  text-align:center;
+}
+.stack-intro h2{
+  font-size:clamp(28px,3.6vw,44px);
+  margin-bottom:16px;
+}
+.stack-intro p{color:rgba(243,238,225,0.72);font-size:15px;}
+
+.stack-stage{
+  position:relative;
+  max-width:640px;
+  margin:0 auto;
+  height:520px;
+  perspective:1600px;
+}
+.stack-progress{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin-bottom:34px;
+}
+.stack-progress .dot{
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(243,238,225,0.25);
+  transition:background .35s var(--ease), transform .35s var(--ease);
+}
+.stack-progress .dot.active{background:var(--gold);transform:scale(1.4);}
+.stack-progress .dot.done{background:var(--gold-light);}
+
+.card{
+  position:absolute;
+  inset:0;
+  background:var(--cream);
+  color:var(--obsidian);
+  border-radius:6px;
+  padding:52px 44px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  box-shadow:0 40px 80px -30px rgba(0,0,0,0.55);
+  will-change:transform, opacity;
+  backface-visibility:hidden;
+}
+.card .card-index{
+  font-family:var(--serif);
+  font-style:italic;
+  font-size:13px;
+  color:var(--burgundy);
+  margin-bottom:14px;
+}
+.card h3{
+  font-size:clamp(22px,2.6vw,30px);
+  margin-bottom:30px;
+  line-height:1.15;
+}
+.card-options{
+  display:grid;
+  gap:10px;
+}
+.card-option{
+  text-align:left;
+  border:1px solid rgba(21,21,15,0.16);
+  border-radius:4px;
+  padding:16px 18px;
+  font-size:14.5px;
+  font-weight:500;
+  transition:border-color .25s var(--ease), background .25s var(--ease);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.card-option:hover{border-color:var(--burgundy);background:rgba(123,46,46,0.04);}
+.card-option[aria-pressed="true"]{
+  border-color:var(--burgundy);
+  background:var(--burgundy);
+  color:var(--cream);
+}
+.card-option .opt-mark{
+  width:16px;height:16px;
+  border-radius:50%;
+  border:1px solid currentColor;
+  flex:0 0 auto;
+}
+.card-option[aria-pressed="true"] .opt-mark{background:var(--gold);border-color:var(--gold);}
+
+/* result card */
+.card.result{
+  background:linear-gradient(155deg, var(--moss-dark), var(--obsidian-2));
+  color:var(--cream);
+  align-items:flex-start;
+}
+.card.result .eyebrow{margin-bottom:14px;}
+.result-plan{
+  font-size:clamp(26px,3.2vw,36px);
+  margin-bottom:16px;
+}
+.result-desc{
+  font-size:14.5px;
+  color:rgba(243,238,225,0.78);
+  margin-bottom:26px;
+  max-width:440px;
+}
+.result-ritual{
+  border-top:var(--rule-dark);
+  padding-top:18px;
+  margin-bottom:28px;
+  width:100%;
+}
+.result-ritual span{
+  display:block;
+  font-size:11px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--gold-light);
+  margin-bottom:8px;
+}
+.result-ritual p{font-size:14px;color:rgba(243,238,225,0.85);}
+.result-actions{display:flex;gap:14px;flex-wrap:wrap;}
+.btn-restart{
+  font-size:12px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:rgba(243,238,225,0.6);
+  border-bottom:1px solid rgba(243,238,225,0.3);
+  padding-bottom:2px;
+}
+
+.stack-nav{
+  display:flex;
+  justify-content:center;
+  margin-top:28px;
+}
+.stack-back{
+  font-size:12px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:rgba(243,238,225,0.5);
+}
+.stack-back:hover{color:var(--cream);}
+.stack-back[hidden]{display:none;}
+
+@media (max-width:640px){
+  .stack-stage{height:600px;}
+  .card{padding:38px 26px;}
+}
+
+/* ============ SLUŽBY — asymmetrical pairs ============ */
+.services{padding:16vh 0;}
+.service-pair{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  gap:1.4vw;
+  align-items:center;
+  margin-bottom:14vh;
+}
+.service-pair:last-child{margin-bottom:0;}
+.service-pair:nth-child(even) .service-media{order:2;}
+.service-pair:nth-child(even) .service-copy{order:1;}
+.service-media{
+  grid-column:span 7;
+  aspect-ratio:4/5;
+  border-radius:3px;
+  overflow:hidden;
+  position:relative;
+}
+.service-media img{width:100%;height:100%;object-fit:cover;}
+.service-copy{grid-column:span 5;padding:0 2vw;}
+.service-copy .eyebrow{margin-bottom:14px;display:block;}
+.service-copy h3{
+  font-size:clamp(24px,2.6vw,34px);
+  margin-bottom:16px;
+}
+.service-copy p{
+  font-size:14.5px;
+  color:var(--smoke);
+  margin-bottom:22px;
+}
+.service-list{list-style:none;font-size:13.5px;}
+.service-list li{
+  padding:10px 0;
+  border-top:var(--rule);
+  display:flex;
+  justify-content:space-between;
+}
+.service-list li:last-child{border-bottom:var(--rule);}
+
+@media (max-width:900px){
+  .service-pair,.service-pair:nth-child(even){grid-template-columns:1fr;}
+  .service-media,.service-copy{grid-column:1/-1;order:initial !important;}
+  .service-copy{padding:0;margin-top:24px;}
+  .service-pair{margin-bottom:8vh;}
+}
+
+/* ============ PROMISE / FACTS strip (cream, "figures") ============ */
+.facts{
+  background:var(--cream);
+  padding:12vh 0;
+}
+.facts-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1px;
+  background:rgba(21,21,15,0.14);
+  border:1px solid rgba(21,21,15,0.14);
+}
+.fact{
+  background:var(--cream);
+  padding:40px 28px;
+  text-align:left;
+}
+.fact .fact-num{
+  font-family:var(--serif);
+  font-size:clamp(34px,4vw,54px);
+  color:var(--burgundy);
+  display:block;
+  margin-bottom:10px;
+}
+.fact .fact-label{
+  font-size:12.5px;
+  color:var(--smoke);
+  line-height:1.4;
+}
+@media (max-width:760px){
+  .facts-grid{grid-template-columns:repeat(2,1fr);}
+}
+
+/* ============ PROCESS ============ */
+.process{padding:16vh 0;background:var(--obsidian);color:var(--cream);}
+.process-step{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  gap:1.4vw;
+  padding:6vh 0;
+  border-top:var(--rule-dark);
+  align-items:center;
+}
+.process-step:last-child{border-bottom:var(--rule-dark);}
+.process-num{
+  grid-column:span 2;
+  font-family:var(--serif);
+  font-size:clamp(40px,4.4vw,64px);
+  color:rgba(243,238,225,0.18);
+}
+.process-copy{grid-column:span 5;}
+.process-copy h3{font-size:clamp(19px,2vw,24px);margin-bottom:10px;}
+.process-copy p{font-size:14px;color:rgba(243,238,225,0.66);}
+.process-media{
+  grid-column:span 5;
+  aspect-ratio:16/10;
+  overflow:hidden;
+  border-radius:3px;
+}
+.process-media img{width:100%;height:100%;object-fit:cover;}
+@media (max-width:900px){
+  .process-num,.process-copy,.process-media{grid-column:1/-1;}
+  .process-media{margin-top:18px;}
+  .process-num{font-size:38px;}
+}
+
+/* ============ ARCHIVE MASONRY ============ */
+.archive{padding:16vh 0;background:var(--cream);}
+.archive-grid{
+  columns:4 220px;
+  column-gap:1.4vw;
+}
+.archive-item{
+  break-inside:avoid;
+  margin-bottom:1.4vw;
+  border-radius:2px;
+  overflow:hidden;
+  position:relative;
+}
+.archive-item img{width:100%;display:block;}
+.archive-item .archive-cap{
+  position:absolute;left:0;right:0;bottom:0;
+  padding:12px 14px;
+  font-size:11px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--cream);
+  background:linear-gradient(0deg, rgba(21,21,15,0.75), transparent);
+}
+@media (max-width:760px){
+  .archive-grid{columns:2 150px;}
+}
+
+/* ============ CLOSING CTA ============ */
+.closing{
+  position:relative;
+  background:var(--obsidian);
+  color:var(--cream);
+  padding:20vh 0 14vh;
+  overflow:hidden;
+  text-align:center;
+}
+.closing-portrait{
+  position:absolute;
+  left:50%;bottom:0;
+  transform:translateX(-50%);
+  width:min(30vw,380px);
+  opacity:0.9;
+  z-index:1;
+  pointer-events:none;
+}
+.closing-gold{
+  position:relative;
+  z-index:2;
+  font-size:clamp(38px,6vw,88px);
+  color:var(--gold-light);
+  line-height:1.02;
+  will-change:transform;
+  margin-bottom:8vh;
+}
+.closing-actions{
+  position:relative;
+  z-index:2;
+  display:flex;
+  gap:18px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+/* ============ CONTACT / FOOTER ============ */
+.contact{
+  background:var(--cream);
+  padding:14vh 0 8vh;
+}
+.contact-grid{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  gap:1.4vw;
+}
+.contact-form{
+  grid-column:1/8;
+}
+.contact-info{
+  grid-column:9/13;
+  padding-left:2vw;
+  border-left:var(--rule);
+}
+@media (max-width:900px){
+  .contact-form,.contact-info{grid-column:1/-1;}
+  .contact-info{border-left:none;border-top:var(--rule);padding:5vh 0 0;margin-top:5vh;}
+}
+.field{margin-bottom:22px;}
+.field label{
+  display:block;
+  font-size:11px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--smoke);
+  margin-bottom:8px;
+}
+.field input,.field select,.field textarea{
+  width:100%;
+  border:none;
+  border-bottom:1px solid rgba(21,21,15,0.28);
+  background:transparent;
+  padding:10px 2px;
+  font-family:var(--grotesk);
+  font-size:15px;
+  color:var(--obsidian);
+  transition:border-color .25s var(--ease);
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none;
+  border-color:var(--burgundy);
+}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media (max-width:520px){.field-row{grid-template-columns:1fr;}}
+.submit-btn{
+  background:var(--burgundy);
+  color:var(--cream);
+  font-weight:700;
+  font-size:13px;
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+  padding:16px 32px;
+  border-radius:999px;
+  margin-top:8px;
+  transition:background .3s var(--ease), transform .3s var(--ease);
+}
+.submit-btn:hover{background:var(--burgundy-light);transform:translateY(-2px);}
+.form-note{font-size:12px;color:var(--smoke);margin-top:14px;}
+.form-status{font-size:13px;margin-top:14px;color:var(--moss);display:none;}
+.form-status.show{display:block;}
+
+.info-block{margin-bottom:28px;}
+.info-block span{
+  display:block;
+  font-size:11px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--smoke);
+  margin-bottom:8px;
+}
+.info-block a, .info-block p{font-size:15px;}
+
+.footer-bottom{
+  border-top:var(--rule);
+  margin-top:10vh;
+  padding-top:22px;
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+  font-size:11px;
+  letter-spacing:0.04em;
+  color:var(--smoke);
+}
+
+/* reveal-on-scroll (simple, respectful of level budget) */
+.reveal{opacity:0;transform:translateY(24px);}
+.reveal.in{opacity:1;transform:translateY(0);transition:opacity .8s var(--ease), transform .8s var(--ease);}
+@media (prefers-reduced-motion: reduce){
+  .reveal{opacity:1 !important;transform:none !important;transition:none !important;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav class="nav">
+  <a href="#top" class="nav-mark">PoSečem</a>
+  <ul class="nav-links">
+    <li><a href="#sluzby">Služby</a></li>
+    <li><a href="#plan">Váš plán</a></li>
+    <li><a href="#proces">Jak to funguje</a></li>
+    <li><a href="#kontakt">Kontakt</a></li>
+  </ul>
+  <a href="#kontakt" class="nav-cta">Nezávazná poptávka</a>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+  <div class="hero-sticky">
+    <div class="hero-bg-texture" aria-hidden="true"></div>
+
+    <div class="ribbon-layer" id="ribbonLayer" aria-hidden="true">
+      <!-- 8 texture frames, CSS/SVG generated, obsidian-graded -->
+      <div class="ribbon-frame" style="--arc:-8px"><img src="1(2).jpeg" alt=""></div>
+      <div class="ribbon-frame" style="--arc:-16px"><img src="2(2).jpeg" alt=""></div>
+      <div class="ribbon-frame" style="--arc:-4px"><img src="3(2).jpeg" alt=""></div>
+      <div class="ribbon-frame" style="--arc:0px"><img src="4(2).jpeg" alt=""></div>
+      <div class="ribbon-frame" style="--arc:-6px"><img src="5(2).jpg" alt=""></div>
+      <div class="ribbon-frame" style="--arc:-14px"><img src="6(2).jpg" alt=""></div>
+      <div class="ribbon-frame" style="--arc:-2px"><img src="7(2).jpg" alt=""></div>
+      <div class="ribbon-frame" style="--arc:-10px"><img src="8(2).png" alt=""></div>
+    </div>
+
+    <div class="portrait-layer" id="portraitLayer">
+      <img class="portrait-cutout" src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNTYwIDkyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBzbGljZSI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9InJnYmEoMCwwLDAsMCkiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSJyZ2JhKDAsMCwwLDApIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PjxmaWx0ZXIgaWQ9ImJsdXJGIiB4PSItNDAlIiB5PSItNDAlIiB3aWR0aD0iMTgwJSIgaGVpZ2h0PSIxODAlIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIyNS4yIi8+PC9maWx0ZXI+PGZpbHRlciBpZD0iZ3JhaW5GIiB4PSItMjAlIiB5PSItMjAlIiB3aWR0aD0iMTQwJSIgaGVpZ2h0PSIxNDAlIj4KICAgICAgPGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjEuMCIgbnVtT2N0YXZlcz0iMiIgc2VlZD0iMzYiIHJlc3VsdD0ibiIvPgogICAgICA8ZmVDb2xvck1hdHJpeCBpbj0ibiIgdHlwZT0ibWF0cml4IiB2YWx1ZXM9IjAgMCAwIDAgMCAgMCAwIDAgMCAwICAwIDAgMCAwIDAgIDAgMCAwIDAuMDM1IDAiLz4KICAgIDwvZmlsdGVyPjxyYWRpYWxHcmFkaWVudCBpZD0idmlnIiBjeD0iNTAlIiBjeT0iNDYlIiByPSI3MCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjU1JSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwLjUiLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPgogIDxyZWN0IHdpZHRoPSI1NjAiIGhlaWdodD0iOTIwIiBmaWxsPSJ1cmwoI2JnKSIvPgogIDxnIGZpbHRlcj0idXJsKCNibHVyRikiPgogICAgICA8ZWxsaXBzZSBjeD0iMjkxLjIiIGN5PSI5MDEuNiIgcng9IjE2OC4wIiByeT0iMTYuNTYiIGZpbGw9IiMxNTE1MEYiIG9wYWNpdHk9IjAuNCIvPgogICAgICA8ZWxsaXBzZSBjeD0iMjkxLjIiIGN5PSI1NzAuNCIgcng9Ijg5LjYwMDAwMDAwMDAwMDAxIiByeT0iMzEyLjgiIGZpbGw9IiMxRDFEMTUiIG9wYWNpdHk9IjAuODUiLz4KICAgICAgPGVsbGlwc2UgY3g9IjI2OC44IiBjeT0iMjU3LjYiIHJ4PSI1MC40IiByeT0iMTEwLjM5OTk5OTk5OTk5OTk5IiBmaWxsPSIjMUQxRDE1IiBvcGFjaXR5PSIwLjg1Ii8+CiAgICAgIDxlbGxpcHNlIGN4PSIzNDEuNTk5OTk5OTk5OTk5OTciIGN5PSI0NjAuMCIgcng9IjI4LjAiIHJ5PSIyMDIuNCIgZmlsbD0iIzJBMkExRSIgb3BhY2l0eT0iMC41Ii8+CiAgICAgIDxlbGxpcHNlIGN4PSIyMTguMzk5OTk5OTk5OTk5OTgiIGN5PSI1MDYuMDAwMDAwMDAwMDAwMDYiIHJ4PSIyOC4wIiByeT0iMjM5LjIwMDAwMDAwMDAwMDAyIiBmaWxsPSIjRDJBQzYzIiBvcGFjaXR5PSIwLjE2Ii8+CiAgICA8L2c+CiAgPHJlY3Qgd2lkdGg9IjU2MCIgaGVpZ2h0PSI5MjAiIGZpbGw9InVybCgjdmlnKSIvPgogIDxyZWN0IHdpZHRoPSI1NjAiIGhlaWdodD0iOTIwIiBmaWx0ZXI9InVybCgjZ3JhaW5GKSIvPgo8L3N2Zz4=" alt="Zahradník PoSečem se zahradnickým nářadím, v bočním světle">
+    </div>
+
+    <div class="hero-copy">
+      <span class="eyebrow">Péče o zahradu · Brno a okolí</span>
+      <h1 class="hero-title">Zahrada, kterou <em>čte</em>, ne jen posekává.</h1>
+      <p class="hero-sub">Sekání trávy, mulčování, zavlažovací systémy a odvoz zahradního odpadu — jedna služba, která si všímá, co vaše zahrada právě potřebuje.</p>
+      <div class="hero-actions">
+        <a href="#plan" class="btn-primary">Najít můj plán péče</a>
+        <a href="#kontakt" class="btn-ghost">Nezávazná poptávka</a>
+      </div>
+    </div>
+
+    <div class="hero-role" id="heroRole">
+      <div>
+        <div class="hero-role-name">PoSečem</div>
+        <div class="hero-role-title">Údržba zahrad · Brno</div>
+      </div>
+      <div class="scroll-hint">Rolujte</div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ PERSPECTIVE CARD STACK — hlavní interakce ============ -->
+<section class="stack-section" id="plan">
+  <div class="wrap">
+    <div class="stack-intro reveal">
+      <span class="eyebrow">Chvíli vám naslouchám</span>
+      <h2>Tři krátké otázky, jeden plán péče.</h2>
+      <p>Žádný dotazník na deset stránek. Jen tolik, kolik potřebujeme vědět, abychom navrhli péči přesně pro vaši zahradu.</p>
+    </div>
+
+    <div class="stack-progress" id="stackProgress" role="presentation">
+      <span class="dot active" data-i="0"></span>
+      <span class="dot" data-i="1"></span>
+      <span class="dot" data-i="2"></span>
+      <span class="dot" data-i="3"></span>
+    </div>
+
+    <div class="stack-stage" id="stackStage" role="group" aria-label="Krátký průzkum vaší zahrady">
+
+      <div class="card" data-step="0" role="group" aria-label="Otázka 1 ze 3">
+        <div class="card-index">01 / 03</div>
+        <h3>Jak dnes vypadá váš trávník?</h3>
+        <div class="card-options" data-q="lawn">
+          <button class="card-option" data-v="dense"><span>Hustý a rychle roste</span><span class="opt-mark"></span></button>
+          <button class="card-option" data-v="sparse"><span>Řídký a unavený</span><span class="opt-mark"></span></button>
+          <button class="card-option" data-v="mossy"><span>Plný mechu a plevele</span><span class="opt-mark"></span></button>
+          <button class="card-option" data-v="new"><span>Nový, teprve se zakládá</span><span class="opt-mark"></span></button>
+        </div>
+      </div>
+
+      <div class="card" data-step="1" role="group" aria-label="Otázka 2 ze 3">
+        <div class="card-index">02 / 03</div>
+        <h3>Kolik slunce zahrada dostává?</h3>
+        <div class="card-options" data-q="sun">
+          <button class="card-option" data-v="full"><span>Slunce celý den</span><span class="opt-mark"></span></button>
+          <button class="card-option" data-v="mixed"><span>Střídavě slunce a stín</span><span class="opt-mark"></span></button>
+          <button class="card-option" data-v="shade"><span>Většinou stín</span><span class="opt-mark"></span></button>
+        </div>
+      </div>
+
+      <div class="card" data-step="2" role="group" aria-label="Otázka 3 ze 3">
+        <div class="card-index">03 / 03</div>
+        <h3>Co vás na zahradě nejvíc zdržuje?</h3>
+        <div class="card-options" data-q="pain">
+          <button class="card-option" data-v="mowing"><span>Časté sekání</span><span class="opt-mark"></span></button>
+          <button class="card-option" data-v="waste"><span>Odklízení posekané trávy a odpadu</span><span class="opt-mark"></span></button>
+          <button class="card-option" data-v="water"><span>Nerovnoměrné zavlažování</span><span class="opt-mark"></span></button>
+          <button class="card-option" data-v="beds"><span>Zarůstající záhony a mulč</span><span class="opt-mark"></span></button>
+        </div>
+      </div>
+
+      <div class="card result" data-step="3" role="group" aria-label="Váš doporučený plán" aria-live="polite">
+        <span class="eyebrow">Váš plán péče</span>
+        <h3 class="result-plan" id="resultPlan">—</h3>
+        <p class="result-desc" id="resultDesc">Odpovězte na tři otázky vlevo a plán se zobrazí tady.</p>
+        <div class="result-ritual">
+          <span>Sezónní rituál</span>
+          <p id="resultRitual">—</p>
+        </div>
+        <div class="result-actions">
+          <a href="#kontakt" class="btn-primary" id="resultCta">Nezávazná poptávka</a>
+          <button class="btn-restart" id="restartStack">Začít znovu</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="stack-nav">
+      <button class="stack-back" id="stackBack" hidden>← Zpět na předchozí otázku</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLUŽBY ============ -->
+<section class="services on-cream" id="sluzby">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow on-cream">Co děláme</span>
+      <h2>Čtyři služby, jeden tým, jedna zahrada.</h2>
+      <p>Objednávejte jednotlivě, nebo jako pravidelnou péči.</p>
+    </div>
+
+    <div class="service-pair reveal">
+      <div class="service-media"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAwIDEwMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQgc2xpY2UiPgogIDxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iYmciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMUIyMDEzIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzMzM0IyMiIvPgogICAgPC9saW5lYXJHcmFkaWVudD48ZmlsdGVyIGlkPSJibHVyRiIgeD0iLTQwJSIgeT0iLTQwJSIgd2lkdGg9IjE4MCUiIGhlaWdodD0iMTgwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNyIvPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9ImdyYWluRiIgeD0iLTIwJSIgeT0iLTIwJSIgd2lkdGg9IjE0MCUiIGhlaWdodD0iMTQwJSI+CiAgICAgIDxmZVR1cmJ1bGVuY2UgdHlwZT0iZnJhY3RhbE5vaXNlIiBiYXNlRnJlcXVlbmN5PSIxLjAiIG51bU9jdGF2ZXM9IjIiIHNlZWQ9IjIxIiByZXN1bHQ9Im4iLz4KICAgICAgPGZlQ29sb3JNYXRyaXggaW49Im4iIHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDAgIDAgMCAwIDAgMCAgMCAwIDAgMCAwICAwIDAgMCAwLjA0NSAwIi8+CiAgICA8L2ZpbHRlcj48cmFkaWFsR3JhZGllbnQgaWQ9InZpZyIgY3g9IjUwJSIgY3k9IjQ2JSIgcj0iNzAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSI1NSUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+CiAgICA8L3JhZGlhbEdyYWRpZW50PjwvZGVmcz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjEwMDAiIGZpbGw9InVybCgjYmcpIi8+CiAgPGcgZmlsdGVyPSJ1cmwoI2JsdXJGKSI+PHJlY3QgeD0iLTgwIiB5PSItODAiIHdpZHRoPSI5NjAiIGhlaWdodD0iNzYiIGZpbGw9IiMzRTRBMjkiIG9wYWNpdHk9IjAuODUiIHRyYW5zZm9ybT0icm90YXRlKC03IDQwMC4wIDUwMC4wKSIvPjxyZWN0IHg9Ii04MCIgeT0iLTQiIHdpZHRoPSI5NjAiIGhlaWdodD0iNzYiIGZpbGw9IiM0QTVBMzEiIG9wYWNpdHk9IjAuODUiIHRyYW5zZm9ybT0icm90YXRlKC03IDQwMC4wIDUwMC4wKSIvPjxyZWN0IHg9Ii04MCIgeT0iNzIiIHdpZHRoPSI5NjAiIGhlaWdodD0iNzYiIGZpbGw9IiMzRTRBMjkiIG9wYWNpdHk9IjAuODUiIHRyYW5zZm9ybT0icm90YXRlKC03IDQwMC4wIDUwMC4wKSIvPjxyZWN0IHg9Ii04MCIgeT0iMTQ4IiB3aWR0aD0iOTYwIiBoZWlnaHQ9Ijc2IiBmaWxsPSIjNEE1QTMxIiBvcGFjaXR5PSIwLjg1IiB0cmFuc2Zvcm09InJvdGF0ZSgtNyA0MDAuMCA1MDAuMCkiLz48cmVjdCB4PSItODAiIHk9IjIyNCIgd2lkdGg9Ijk2MCIgaGVpZ2h0PSI3NiIgZmlsbD0iIzNFNEEyOSIgb3BhY2l0eT0iMC44NSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgNDAwLjAgNTAwLjApIi8+PHJlY3QgeD0iLTgwIiB5PSIzMDAiIHdpZHRoPSI5NjAiIGhlaWdodD0iNzYiIGZpbGw9IiM0QTVBMzEiIG9wYWNpdHk9IjAuODUiIHRyYW5zZm9ybT0icm90YXRlKC03IDQwMC4wIDUwMC4wKSIvPjxyZWN0IHg9Ii04MCIgeT0iMzc2IiB3aWR0aD0iOTYwIiBoZWlnaHQ9Ijc2IiBmaWxsPSIjM0U0QTI5IiBvcGFjaXR5PSIwLjg1IiB0cmFuc2Zvcm09InJvdGF0ZSgtNyA0MDAuMCA1MDAuMCkiLz48cmVjdCB4PSItODAiIHk9IjQ1MiIgd2lkdGg9Ijk2MCIgaGVpZ2h0PSI3NiIgZmlsbD0iIzRBNUEzMSIgb3BhY2l0eT0iMC44NSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgNDAwLjAgNTAwLjApIi8+PHJlY3QgeD0iLTgwIiB5PSI1MjgiIHdpZHRoPSI5NjAiIGhlaWdodD0iNzYiIGZpbGw9IiMzRTRBMjkiIG9wYWNpdHk9IjAuODUiIHRyYW5zZm9ybT0icm90YXRlKC03IDQwMC4wIDUwMC4wKSIvPjxyZWN0IHg9Ii04MCIgeT0iNjA0IiB3aWR0aD0iOTYwIiBoZWlnaHQ9Ijc2IiBmaWxsPSIjNEE1QTMxIiBvcGFjaXR5PSIwLjg1IiB0cmFuc2Zvcm09InJvdGF0ZSgtNyA0MDAuMCA1MDAuMCkiLz48cmVjdCB4PSItODAiIHk9IjY4MCIgd2lkdGg9Ijk2MCIgaGVpZ2h0PSI3NiIgZmlsbD0iIzNFNEEyOSIgb3BhY2l0eT0iMC44NSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgNDAwLjAgNTAwLjApIi8+PHJlY3QgeD0iLTgwIiB5PSI3NTYiIHdpZHRoPSI5NjAiIGhlaWdodD0iNzYiIGZpbGw9IiM0QTVBMzEiIG9wYWNpdHk9IjAuODUiIHRyYW5zZm9ybT0icm90YXRlKC03IDQwMC4wIDUwMC4wKSIvPjxyZWN0IHg9Ii04MCIgeT0iODMyIiB3aWR0aD0iOTYwIiBoZWlnaHQ9Ijc2IiBmaWxsPSIjM0U0QTI5IiBvcGFjaXR5PSIwLjg1IiB0cmFuc2Zvcm09InJvdGF0ZSgtNyA0MDAuMCA1MDAuMCkiLz48cmVjdCB4PSItODAiIHk9IjkwOCIgd2lkdGg9Ijk2MCIgaGVpZ2h0PSI3NiIgZmlsbD0iIzRBNUEzMSIgb3BhY2l0eT0iMC44NSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgNDAwLjAgNTAwLjApIi8+PHJlY3QgeD0iLTgwIiB5PSI5ODQiIHdpZHRoPSI5NjAiIGhlaWdodD0iNzYiIGZpbGw9IiMzRTRBMjkiIG9wYWNpdHk9IjAuODUiIHRyYW5zZm9ybT0icm90YXRlKC03IDQwMC4wIDUwMC4wKSIvPjxyZWN0IHg9Ii04MCIgeT0iMTA2MCIgd2lkdGg9Ijk2MCIgaGVpZ2h0PSI3NiIgZmlsbD0iIzRBNUEzMSIgb3BhY2l0eT0iMC44NSIgdHJhbnNmb3JtPSJyb3RhdGUoLTcgNDAwLjAgNTAwLjApIi8+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjgwMCIgaGVpZ2h0PSIyMjAuMCIgZmlsbD0iIzE1MTUwRiIgb3BhY2l0eT0iMC4zIi8+PGVsbGlwc2UgY3g9IjY1Ni4wIiBjeT0iODAuMCIgcng9IjI4MCIgcnk9IjIyMCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yMiIvPjwvZz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjEwMDAiIGZpbGw9InVybCgjdmlnKSIvPgogIDxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iMTAwMCIgZmlsdGVyPSJ1cmwoI2dyYWluRikiLz4KPC9zdmc+" alt="Čerstvě posekaný trávník s pravidelnými pruhy"></div>
+      <div class="service-copy">
+        <span class="eyebrow on-cream">01 — Sekání trávy</span>
+        <h3>Pravidelné sekání</h3>
+        <p>Sekání v cyklu, který sedí vaší zahradě — jednorázově, nebo v pravidelných intervalech po celou sezónu.</p>
+        <ul class="service-list">
+          <li><span>Rozsah</span><span>Zahrady i větší pozemky</span></li>
+          <li><span>Frekvence</span><span>Podle růstu, ne podle kalendáře</span></li>
+          <li><span>Oblast</span><span>Brno a okolí</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="service-pair reveal">
+      <div class="service-media"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAwIDEwMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQgc2xpY2UiPgogIDxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iYmciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMjQxQTEwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzFBMTMwQyIvPgogICAgPC9saW5lYXJHcmFkaWVudD48ZmlsdGVyIGlkPSJibHVyRiIgeD0iLTQwJSIgeT0iLTQwJSIgd2lkdGg9IjE4MCUiIGhlaWdodD0iMTgwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iOCIvPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9ImdyYWluRiIgeD0iLTIwJSIgeT0iLTIwJSIgd2lkdGg9IjE0MCUiIGhlaWdodD0iMTQwJSI+CiAgICAgIDxmZVR1cmJ1bGVuY2UgdHlwZT0iZnJhY3RhbE5vaXNlIiBiYXNlRnJlcXVlbmN5PSIxLjAiIG51bU9jdGF2ZXM9IjIiIHNlZWQ9IjU1OCIgcmVzdWx0PSJuIi8+CiAgICAgIDxmZUNvbG9yTWF0cml4IGluPSJuIiB0eXBlPSJtYXRyaXgiIHZhbHVlcz0iMCAwIDAgMCAwICAwIDAgMCAwIDAgIDAgMCAwIDAgMCAgMCAwIDAgMC4wNiAwIi8+CiAgICA8L2ZpbHRlcj48cmFkaWFsR3JhZGllbnQgaWQ9InZpZyIgY3g9IjUwJSIgY3k9IjQ2JSIgcj0iNzAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSI1NSUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+CiAgICA8L3JhZGlhbEdyYWRpZW50PjwvZGVmcz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjEwMDAiIGZpbGw9InVybCgjYmcpIi8+CiAgPGcgZmlsdGVyPSJ1cmwoI2JsdXJGKSI+PGVsbGlwc2UgY3g9IjM0NC41IiBjeT0iNjQxLjgiIHJ4PSIyMi45IiByeT0iMTYuMSIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC41MCIvPjxlbGxpcHNlIGN4PSI0MTcuNyIgY3k9IjgyNC44IiByeD0iMjAuNCIgcnk9IjE0LjMiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuNTMiLz48ZWxsaXBzZSBjeD0iNzM0LjkiIGN5PSI0NDYuNSIgcng9IjguMiIgcnk9IjUuOCIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC41NCIvPjxlbGxpcHNlIGN4PSI3OTQuNSIgY3k9IjY1OS40IiByeD0iMTAuNSIgcnk9IjcuMyIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC41MiIvPjxlbGxpcHNlIGN4PSI2Ni4zIiBjeT0iNDcyLjIiIHJ4PSIyMi4zIiByeT0iMTUuNiIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC40NyIvPjxlbGxpcHNlIGN4PSI3LjUiIGN5PSI2NjkuNCIgcng9IjIzLjgiIHJ5PSIxNi43IiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjM5Ii8+PGVsbGlwc2UgY3g9Ijk3LjEiIGN5PSI0NzIuMyIgcng9IjEyLjQiIHJ5PSI4LjciIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNDgiLz48ZWxsaXBzZSBjeD0iNTk1LjQiIGN5PSI5MjIuOCIgcng9IjEzLjkiIHJ5PSI5LjciIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNTkiLz48ZWxsaXBzZSBjeD0iNjcuNCIgY3k9IjYyOC42IiByeD0iMTkuMyIgcnk9IjEzLjUiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuNTciLz48ZWxsaXBzZSBjeD0iNzEyLjAiIGN5PSI5MTMuNSIgcng9IjguOCIgcnk9IjYuMiIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC4zMCIvPjxlbGxpcHNlIGN4PSIxMS44IiBjeT0iNjUwLjciIHJ4PSIyMS4xIiByeT0iMTQuOCIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC40NiIvPjxlbGxpcHNlIGN4PSIyNTAuMCIgY3k9IjYwMC4xIiByeD0iMjMuMyIgcnk9IjE2LjMiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuNTQiLz48ZWxsaXBzZSBjeD0iMjUzLjAiIGN5PSI5NDguOCIgcng9IjE5LjYiIHJ5PSIxMy44IiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjU3Ii8+PGVsbGlwc2UgY3g9IjExNS45IiBjeT0iNzk3LjQiIHJ4PSIxMy44IiByeT0iOS43IiBmaWxsPSIjNkI0NDI2IiBvcGFjaXR5PSIwLjU1Ii8+PGVsbGlwc2UgY3g9IjMzNC40IiBjeT0iMzg1LjciIHJ4PSIyMC42IiByeT0iMTQuNCIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC42MSIvPjxlbGxpcHNlIGN4PSI0NTMuNSIgY3k9IjI5Mi40IiByeD0iOS4wIiByeT0iNi4zIiBmaWxsPSIjM0EyQTE4IiBvcGFjaXR5PSIwLjY1Ii8+PGVsbGlwc2UgY3g9IjU4MC42IiBjeT0iMTUuNSIgcng9IjEwLjQiIHJ5PSI3LjMiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuNTMiLz48ZWxsaXBzZSBjeD0iNzgxLjEiIGN5PSIyNDYuMSIgcng9IjE0LjIiIHJ5PSI5LjkiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuNTQiLz48ZWxsaXBzZSBjeD0iNzE2LjkiIGN5PSI4MDcuNSIgcng9IjEyLjUiIHJ5PSI4LjgiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuNDMiLz48ZWxsaXBzZSBjeD0iMjE0LjQiIGN5PSIxNTcuMyIgcng9IjIyLjciIHJ5PSIxNS45IiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjQyIi8+PGVsbGlwc2UgY3g9IjExMi41IiBjeT0iODkwLjYiIHJ4PSIyMy45IiByeT0iMTYuNyIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC40MSIvPjxlbGxpcHNlIGN4PSI2ODAuOSIgY3k9IjgwNy4wIiByeD0iMTkuMCIgcnk9IjEzLjMiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuNDQiLz48ZWxsaXBzZSBjeD0iNjguMSIgY3k9IjU1My43IiByeD0iMjAuOCIgcnk9IjE0LjUiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNjIiLz48ZWxsaXBzZSBjeD0iNTc3LjgiIGN5PSI5ODIuMyIgcng9IjEzLjAiIHJ5PSI5LjEiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuNTciLz48ZWxsaXBzZSBjeD0iMzcyLjMiIGN5PSIyMDYuNiIgcng9IjEyLjEiIHJ5PSI4LjUiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuNjIiLz48ZWxsaXBzZSBjeD0iMzY3LjgiIGN5PSI4Ny43IiByeD0iMjAuOSIgcnk9IjE0LjYiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuMzkiLz48ZWxsaXBzZSBjeD0iNDYzLjciIGN5PSI4OTYuOSIgcng9IjIyLjIiIHJ5PSIxNS41IiBmaWxsPSIjM0EyQTE4IiBvcGFjaXR5PSIwLjQ5Ii8+PGVsbGlwc2UgY3g9IjQ3MS41IiBjeT0iMTg5LjIiIHJ4PSIxMS4xIiByeT0iNy44IiBmaWxsPSIjNkI0NDI2IiBvcGFjaXR5PSIwLjYyIi8+PGVsbGlwc2UgY3g9IjIzMS44IiBjeT0iNTc3LjkiIHJ4PSIxMy43IiByeT0iOS42IiBmaWxsPSIjNkI0NDI2IiBvcGFjaXR5PSIwLjQwIi8+PGVsbGlwc2UgY3g9IjczOC4xIiBjeT0iNDkzLjMiIHJ4PSIyMS45IiByeT0iMTUuMyIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC41NSIvPjxlbGxpcHNlIGN4PSI2MjkuOSIgY3k9IjE1Ni4yIiByeD0iMTcuNiIgcnk9IjEyLjMiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuNDEiLz48ZWxsaXBzZSBjeD0iNDg1LjciIGN5PSI5NC4xIiByeD0iMTEuMyIgcnk9IjcuOSIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC41MyIvPjxlbGxpcHNlIGN4PSIxNzAuOSIgY3k9IjkyNS41IiByeD0iMTIuNSIgcnk9IjguNyIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC42OCIvPjxlbGxpcHNlIGN4PSI2MTMuOCIgY3k9IjgxOC44IiByeD0iMjMuNCIgcnk9IjE2LjQiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuNjQiLz48ZWxsaXBzZSBjeD0iMjcxLjEiIGN5PSI5OTQuNiIgcng9IjE0LjEiIHJ5PSI5LjgiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuMzIiLz48ZWxsaXBzZSBjeD0iNDQ1LjkiIGN5PSI4NzAuNyIgcng9IjE1LjMiIHJ5PSIxMC43IiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjY1Ii8+PGVsbGlwc2UgY3g9IjUxMS45IiBjeT0iOTIyLjIiIHJ4PSIxOS4zIiByeT0iMTMuNSIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC40MCIvPjxlbGxpcHNlIGN4PSI0NTEuNiIgY3k9IjY0MC42IiByeD0iMjMuMyIgcnk9IjE2LjMiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuMzciLz48ZWxsaXBzZSBjeD0iNjc5LjgiIGN5PSIzNzAuOSIgcng9IjExLjgiIHJ5PSI4LjIiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuMzciLz48ZWxsaXBzZSBjeD0iNzUzLjQiIGN5PSI5NDEuMiIgcng9IjguOSIgcnk9IjYuMyIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC42MyIvPjxlbGxpcHNlIGN4PSIzNy42IiBjeT0iNzg2LjQiIHJ4PSIxOS40IiByeT0iMTMuNSIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC4zMiIvPjxlbGxpcHNlIGN4PSIxMTUuOCIgY3k9Ijc1NS4wIiByeD0iMjMuMCIgcnk9IjE2LjEiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuNTQiLz48ZWxsaXBzZSBjeD0iMzUzLjAiIGN5PSI2NTIuNSIgcng9IjE1LjUiIHJ5PSIxMC45IiBmaWxsPSIjM0EyQTE4IiBvcGFjaXR5PSIwLjQwIi8+PGVsbGlwc2UgY3g9Ijk5LjMiIGN5PSI0ODEuMyIgcng9IjEwLjciIHJ5PSI3LjUiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNjIiLz48ZWxsaXBzZSBjeD0iNzMxLjQiIGN5PSI4OTIuMiIgcng9IjE1LjUiIHJ5PSIxMC44IiBmaWxsPSIjNkI0NDI2IiBvcGFjaXR5PSIwLjYyIi8+PGVsbGlwc2UgY3g9IjEyNS42IiBjeT0iODMyLjgiIHJ4PSI5LjIiIHJ5PSI2LjUiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuNjYiLz48ZWxsaXBzZSBjeD0iMTExLjgiIGN5PSI0NDcuMiIgcng9IjkuNiIgcnk9IjYuNyIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC42NCIvPjxlbGxpcHNlIGN4PSI1MDIuNyIgY3k9IjQ1Mi4zIiByeD0iMTMuNCIgcnk9IjkuNCIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC40OSIvPjxlbGxpcHNlIGN4PSI1MDIuNSIgY3k9IjE0Mi44IiByeD0iMTEuNSIgcnk9IjguMSIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC4zNyIvPjxlbGxpcHNlIGN4PSIzNjEuMSIgY3k9Ijg4OS4zIiByeD0iMTUuMCIgcnk9IjEwLjUiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNDEiLz48ZWxsaXBzZSBjeD0iMzI5LjQiIGN5PSIxNTUuNyIgcng9IjEyLjMiIHJ5PSI4LjYiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuNDMiLz48ZWxsaXBzZSBjeD0iMTM0LjIiIGN5PSI0OTEuMCIgcng9IjEzLjEiIHJ5PSI5LjIiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuMzUiLz48ZWxsaXBzZSBjeD0iNzgyLjkiIGN5PSI1Ni45IiByeD0iMjIuMyIgcnk9IjE1LjYiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNTIiLz48ZWxsaXBzZSBjeD0iNjY4LjIiIGN5PSIxMTkuMiIgcng9IjIwLjEiIHJ5PSIxNC4xIiBmaWxsPSIjM0EyQTE4IiBvcGFjaXR5PSIwLjQ3Ii8+PGVsbGlwc2UgY3g9IjIwOS4yIiBjeT0iMjM4LjciIHJ4PSIxMS44IiByeT0iOC4zIiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjQyIi8+PGVsbGlwc2UgY3g9IjcxNy4wIiBjeT0iNTcuNSIgcng9IjE5LjYiIHJ5PSIxMy43IiBmaWxsPSIjM0EyQTE4IiBvcGFjaXR5PSIwLjM2Ii8+PGVsbGlwc2UgY3g9IjUxMS44IiBjeT0iNDQyLjEiIHJ4PSIxNi4xIiByeT0iMTEuMyIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC40OCIvPjxlbGxpcHNlIGN4PSI2MzEuNyIgY3k9Ijk0My42IiByeD0iMTIuNiIgcnk9IjguOCIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC40NyIvPjxlbGxpcHNlIGN4PSI3MjkuNiIgY3k9IjIxOC4zIiByeD0iMTcuMSIgcnk9IjEyLjAiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNjQiLz48ZWxsaXBzZSBjeD0iNDE3LjMiIGN5PSIyMzAuNCIgcng9IjEwLjgiIHJ5PSI3LjYiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuNjMiLz48ZWxsaXBzZSBjeD0iNzExLjUiIGN5PSI3MzAuOCIgcng9IjIwLjIiIHJ5PSIxNC4xIiBmaWxsPSIjNkI0NDI2IiBvcGFjaXR5PSIwLjM4Ii8+PGVsbGlwc2UgY3g9IjQ4OS45IiBjeT0iNzA3LjgiIHJ4PSIyMS4wIiByeT0iMTQuNyIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC4zOCIvPjxlbGxpcHNlIGN4PSI1Mi42IiBjeT0iNzMyLjciIHJ4PSIxNC41IiByeT0iMTAuMiIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC41MSIvPjxlbGxpcHNlIGN4PSIyNzguMSIgY3k9IjI4MS44IiByeD0iMTguMiIgcnk9IjEyLjgiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuMzQiLz48ZWxsaXBzZSBjeD0iMzI3LjYiIGN5PSI3NjMuMCIgcng9IjEwLjEiIHJ5PSI3LjEiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuNDAiLz48ZWxsaXBzZSBjeD0iNDUwLjUiIGN5PSI5ODUuNyIgcng9IjguNiIgcnk9IjYuMCIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC41MyIvPjxlbGxpcHNlIGN4PSI2ODYuNSIgY3k9IjM1Ni4yIiByeD0iMjIuOSIgcnk9IjE2LjAiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuMzUiLz48ZWxsaXBzZSBjeD0iNTcxLjciIGN5PSI4MTYuNSIgcng9IjIxLjgiIHJ5PSIxNS4zIiBmaWxsPSIjM0EyQTE4IiBvcGFjaXR5PSIwLjYxIi8+PGVsbGlwc2UgY3g9IjY5NC41IiBjeT0iNTc2LjMiIHJ4PSIyMi40IiByeT0iMTUuNyIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC42NSIvPjxlbGxpcHNlIGN4PSI3NjMuMiIgY3k9IjQ5NC44IiByeD0iMTYuMiIgcnk9IjExLjMiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuMzEiLz48ZWxsaXBzZSBjeD0iNzczLjkiIGN5PSIyMjMuNyIgcng9IjEwLjkiIHJ5PSI3LjYiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuNDIiLz48ZWxsaXBzZSBjeD0iNDQ0LjMiIGN5PSI5NTUuNCIgcng9IjguMyIgcnk9IjUuOCIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC40MCIvPjxlbGxpcHNlIGN4PSI2NjkuOSIgY3k9IjYzNi44IiByeD0iMTUuNCIgcnk9IjEwLjgiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNTgiLz48ZWxsaXBzZSBjeD0iODIuMyIgY3k9Ijg2OS41IiByeD0iMTkuNSIgcnk9IjEzLjYiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuNDEiLz48ZWxsaXBzZSBjeD0iMzcxLjkiIGN5PSI1ODUuOSIgcng9IjIwLjIiIHJ5PSIxNC4xIiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjM1Ii8+PGVsbGlwc2UgY3g9IjMyNC41IiBjeT0iMTM3LjAiIHJ4PSIxNy41IiByeT0iMTIuMiIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC4zNiIvPjxlbGxpcHNlIGN4PSI0NTguMyIgY3k9Ijc0Ni42IiByeD0iMTAuNiIgcnk9IjcuNCIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC42OCIvPjxlbGxpcHNlIGN4PSIzMTEuMCIgY3k9IjQyMC41IiByeD0iMjEuNCIgcnk9IjE1LjAiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuNDYiLz48ZWxsaXBzZSBjeD0iNzUzLjAiIGN5PSI3NzYuOSIgcng9IjEzLjQiIHJ5PSI5LjQiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNjQiLz48ZWxsaXBzZSBjeD0iNTcyLjQiIGN5PSI4NDMuMCIgcng9IjE3LjAiIHJ5PSIxMS45IiBmaWxsPSIjM0EyQTE4IiBvcGFjaXR5PSIwLjYzIi8+PGVsbGlwc2UgY3g9IjY3OC4xIiBjeT0iNTMuNiIgcng9IjE2LjMiIHJ5PSIxMS40IiBmaWxsPSIjM0EyQTE4IiBvcGFjaXR5PSIwLjQwIi8+PGVsbGlwc2UgY3g9IjMzNy43IiBjeT0iNjMyLjciIHJ4PSIxMy44IiByeT0iOS43IiBmaWxsPSIjNkI0NDI2IiBvcGFjaXR5PSIwLjMzIi8+PGVsbGlwc2UgY3g9IjM0Ni40IiBjeT0iNTA0LjgiIHJ4PSI4LjMiIHJ5PSI1LjgiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNDciLz48ZWxsaXBzZSBjeD0iMzE3LjYiIGN5PSI5OTcuNSIgcng9IjE1LjMiIHJ5PSIxMC43IiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjYyIi8+PGVsbGlwc2UgY3g9IjcwNy41IiBjeT0iODg0LjYiIHJ4PSI4LjUiIHJ5PSI2LjAiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuNjciLz48ZWxsaXBzZSBjeD0iNDk4LjgiIGN5PSI2MjguMiIgcng9IjIwLjkiIHJ5PSIxNC42IiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjU1Ii8+PGVsbGlwc2UgY3g9IjIwMC41IiBjeT0iNTIwLjMiIHJ4PSIxNC45IiByeT0iMTAuNSIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC40MiIvPjxlbGxpcHNlIGN4PSIyNDQuMyIgY3k9IjY0Ny41IiByeD0iOS45IiByeT0iNi45IiBmaWxsPSIjM0EyQTE4IiBvcGFjaXR5PSIwLjMzIi8+PGVsbGlwc2UgY3g9IjQ3Mi4yIiBjeT0iOTMxLjkiIHJ4PSIxNS4wIiByeT0iMTAuNSIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC42NSIvPjxlbGxpcHNlIGN4PSI3MzIuNSIgY3k9IjU3Ny4zIiByeD0iMTIuNCIgcnk9IjguNyIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC42MCIvPjxlbGxpcHNlIGN4PSIyMjkuNyIgY3k9IjQ1NC4xIiByeD0iMTkuMSIgcnk9IjEzLjQiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNTYiLz48ZWxsaXBzZSBjeD0iMTYxLjAiIGN5PSI3MTAuNCIgcng9IjE1LjQiIHJ5PSIxMC44IiBmaWxsPSIjM0EyQTE4IiBvcGFjaXR5PSIwLjU1Ii8+PGVsbGlwc2UgY3g9IjM3NS4yIiBjeT0iMzEwLjUiIHJ4PSIxMS45IiByeT0iOC4zIiBmaWxsPSIjNkI0NDI2IiBvcGFjaXR5PSIwLjM4Ii8+PGVsbGlwc2UgY3g9IjQzNi43IiBjeT0iOTY5LjYiIHJ4PSIxNC4zIiByeT0iMTAuMCIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC4zNiIvPjxlbGxpcHNlIGN4PSI3NjEuNyIgY3k9IjMyNC4wIiByeD0iMTMuMiIgcnk9IjkuMiIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC40MSIvPjxlbGxpcHNlIGN4PSI3OTAuMCIgY3k9IjI5NS41IiByeD0iMjAuNCIgcnk9IjE0LjIiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNTIiLz48ZWxsaXBzZSBjeD0iNDg0LjciIGN5PSIzNDguMCIgcng9IjE4LjUiIHJ5PSIxMy4wIiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjYzIi8+PGVsbGlwc2UgY3g9IjI4My4zIiBjeT0iNzYyLjgiIHJ4PSIxNi4zIiByeT0iMTEuNCIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC40NyIvPjxlbGxpcHNlIGN4PSI1MzQuNiIgY3k9IjE0MC4zIiByeD0iMTEuMiIgcnk9IjcuOSIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC42MyIvPjxlbGxpcHNlIGN4PSI0MTQuMiIgY3k9IjczOC44IiByeD0iMTkuOSIgcnk9IjEzLjkiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuNDEiLz48ZWxsaXBzZSBjeD0iNTA0LjUiIGN5PSI2MzIuMSIgcng9IjE5LjMiIHJ5PSIxMy41IiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjY1Ii8+PGVsbGlwc2UgY3g9IjMuNSIgY3k9Ijc2NS43IiByeD0iMTcuNCIgcnk9IjEyLjIiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuNDYiLz48ZWxsaXBzZSBjeD0iNzk0LjMiIGN5PSIxNDkuNiIgcng9IjIxLjYiIHJ5PSIxNS4xIiBmaWxsPSIjM0EyQTE4IiBvcGFjaXR5PSIwLjY1Ii8+PGVsbGlwc2UgY3g9IjQ4NS45IiBjeT0iMzc5LjYiIHJ4PSIxNS4yIiByeT0iMTAuNyIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC40MiIvPjxlbGxpcHNlIGN4PSIyODIuMSIgY3k9IjM1My4wIiByeD0iMTYuNCIgcnk9IjExLjUiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuNTYiLz48ZWxsaXBzZSBjeD0iNS40IiBjeT0iNzQ1LjgiIHJ4PSIyMy44IiByeT0iMTYuNyIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC40OCIvPjxlbGxpcHNlIGN4PSIxNDcuNCIgY3k9IjMwNC4wIiByeD0iMTAuMyIgcnk9IjcuMiIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC41MyIvPjxlbGxpcHNlIGN4PSI3MC4zIiBjeT0iOTIwLjIiIHJ4PSIxMy4yIiByeT0iOS4yIiBmaWxsPSIjNkI0NDI2IiBvcGFjaXR5PSIwLjY4Ii8+PGVsbGlwc2UgY3g9IjE2My40IiBjeT0iNDI2LjQiIHJ4PSIyMi42IiByeT0iMTUuOCIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC4zMSIvPjxlbGxpcHNlIGN4PSIyMDUuMiIgY3k9Ijg5NS45IiByeD0iMTIuOCIgcnk9IjkuMCIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC41MiIvPjxlbGxpcHNlIGN4PSI3OTguNyIgY3k9IjUxNy40IiByeD0iMTYuMyIgcnk9IjExLjQiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuNDYiLz48ZWxsaXBzZSBjeD0iMjg2LjIiIGN5PSI1OTQuNyIgcng9IjEzLjYiIHJ5PSI5LjUiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuNTciLz48ZWxsaXBzZSBjeD0iNDIwLjIiIGN5PSI5OS4wIiByeD0iMTQuMCIgcnk9IjkuOCIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC41NiIvPjxlbGxpcHNlIGN4PSI3NDIuNyIgY3k9IjE1NC4yIiByeD0iMTEuMCIgcnk9IjcuNyIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC40OSIvPjxlbGxpcHNlIGN4PSIzNTIuMSIgY3k9IjYyNC42IiByeD0iMjMuOSIgcnk9IjE2LjgiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuNTgiLz48ZWxsaXBzZSBjeD0iNTk3LjIiIGN5PSI5Mi4yIiByeD0iMTMuOCIgcnk9IjkuNyIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC42OSIvPjxlbGxpcHNlIGN4PSI2NjAuOCIgY3k9IjUxMi42IiByeD0iOS44IiByeT0iNi44IiBmaWxsPSIjM0EyQTE4IiBvcGFjaXR5PSIwLjU4Ii8+PGVsbGlwc2UgY3g9IjY1Ni40IiBjeT0iOTkwLjIiIHJ4PSIyMi4yIiByeT0iMTUuNSIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC41NSIvPjxlbGxpcHNlIGN4PSI0MTkuMiIgY3k9IjgxNi4yIiByeD0iMTEuMyIgcnk9IjcuOSIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC40NiIvPjxlbGxpcHNlIGN4PSI0OC4xIiBjeT0iNTY1LjAiIHJ4PSI5LjciIHJ5PSI2LjgiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuNTgiLz48ZWxsaXBzZSBjeD0iOC42IiBjeT0iMi44IiByeD0iMTkuNCIgcnk9IjEzLjYiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuNjciLz48ZWxsaXBzZSBjeD0iMzE4LjEiIGN5PSI5OC41IiByeD0iOC4yIiByeT0iNS44IiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjM4Ii8+PGVsbGlwc2UgY3g9IjM5OC4zIiBjeT0iNTUzLjIiIHJ4PSIxMi4zIiByeT0iOC42IiBmaWxsPSIjNkI0NDI2IiBvcGFjaXR5PSIwLjUzIi8+PGVsbGlwc2UgY3g9IjMyOC45IiBjeT0iMTIxLjUiIHJ4PSIxMC41IiByeT0iNy40IiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjMxIi8+PGVsbGlwc2UgY3g9IjYwLjkiIGN5PSI5NDcuOCIgcng9IjE1LjgiIHJ5PSIxMS4xIiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjU1Ii8+PGVsbGlwc2UgY3g9IjY0NS4zIiBjeT0iNjIuMSIgcng9IjguMiIgcnk9IjUuNyIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC4zNiIvPjxlbGxpcHNlIGN4PSIxOTAuNiIgY3k9IjI3NS40IiByeD0iOC41IiByeT0iNi4wIiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjY0Ii8+PGVsbGlwc2UgY3g9Ijc1OC4yIiBjeT0iNjMuMCIgcng9IjExLjEiIHJ5PSI3LjciIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuMzEiLz48ZWxsaXBzZSBjeD0iMTc2LjAiIGN5PSIzOTYuMCIgcng9IjIwLjIiIHJ5PSIxNC4yIiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjQ4Ii8+PGVsbGlwc2UgY3g9IjQ5Ni4xIiBjeT0iMjQ5LjMiIHJ4PSI4LjciIHJ5PSI2LjEiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNDMiLz48ZWxsaXBzZSBjeD0iNzE5LjEiIGN5PSI4MTUuOSIgcng9IjEyLjkiIHJ5PSI5LjAiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuNjgiLz48ZWxsaXBzZSBjeD0iMzk2LjQiIGN5PSI5NDkuNyIgcng9IjExLjkiIHJ5PSI4LjMiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuNTciLz48ZWxsaXBzZSBjeD0iNDY3LjkiIGN5PSI0MTMuNSIgcng9IjE0LjQiIHJ5PSIxMC4xIiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjMxIi8+PGVsbGlwc2UgY3g9IjY5NC42IiBjeT0iODcuNSIgcng9IjEwLjciIHJ5PSI3LjUiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuMzciLz48ZWxsaXBzZSBjeD0iNzc3LjIiIGN5PSIyOTAuNyIgcng9IjE3LjAiIHJ5PSIxMS45IiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjQzIi8+PGVsbGlwc2UgY3g9IjY5Ny4yIiBjeT0iMzM1LjkiIHJ4PSIxOC40IiByeT0iMTIuOSIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC40NyIvPjxlbGxpcHNlIGN4PSI3MzAuNCIgY3k9IjU1My44IiByeD0iMTQuMiIgcnk9IjkuOSIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC40MSIvPjxlbGxpcHNlIGN4PSIxODkuNyIgY3k9IjM0LjkiIHJ4PSIxOC42IiByeT0iMTMuMCIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC42MiIvPjxlbGxpcHNlIGN4PSIxOTMuNCIgY3k9IjEyOS45IiByeD0iMTEuMSIgcnk9IjcuOCIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC41MiIvPjxlbGxpcHNlIGN4PSIzNzMuNiIgY3k9Ijc5NC45IiByeD0iMTEuOCIgcnk9IjguMyIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC40NCIvPjxlbGxpcHNlIGN4PSI1NzguMCIgY3k9IjM3Ni45IiByeD0iMjMuMyIgcnk9IjE2LjMiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNDIiLz48ZWxsaXBzZSBjeD0iMzgwLjgiIGN5PSIyMDQuNCIgcng9IjIxLjciIHJ5PSIxNS4yIiBmaWxsPSIjNkI0NDI2IiBvcGFjaXR5PSIwLjY4Ii8+PGVsbGlwc2UgY3g9Ijc5OC4zIiBjeT0iNTk2LjAiIHJ4PSIxNS4wIiByeT0iMTAuNSIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC41MSIvPjxlbGxpcHNlIGN4PSIzMjMuMyIgY3k9IjUxMC4yIiByeD0iMTAuMCIgcnk9IjcuMCIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC41NyIvPjxlbGxpcHNlIGN4PSI3My4yIiBjeT0iODUxLjkiIHJ4PSIxOS44IiByeT0iMTMuOCIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC4zMSIvPjxlbGxpcHNlIGN4PSI1NzQuNiIgY3k9IjE0NS4xIiByeD0iOC4yIiByeT0iNS44IiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjU4Ii8+PGVsbGlwc2UgY3g9IjYyMC45IiBjeT0iMjMxLjYiIHJ4PSIxMS4wIiByeT0iNy43IiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjMzIi8+PGVsbGlwc2UgY3g9IjczMS4xIiBjeT0iODA1LjIiIHJ4PSIyMC4xIiByeT0iMTQuMSIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC4zMyIvPjxlbGxpcHNlIGN4PSIyNDkuMCIgY3k9IjIyNi40IiByeD0iMTAuMCIgcnk9IjcuMCIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC40MSIvPjxlbGxpcHNlIGN4PSIzMjIuNyIgY3k9IjkwOC45IiByeD0iMjAuNCIgcnk9IjE0LjMiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNjciLz48ZWxsaXBzZSBjeD0iMTQxLjEiIGN5PSIzNjYuNiIgcng9IjIwLjgiIHJ5PSIxNC42IiBmaWxsPSIjM0EyQTE4IiBvcGFjaXR5PSIwLjY2Ii8+PGVsbGlwc2UgY3g9IjIwLjIiIGN5PSI3MDMuOCIgcng9IjE1LjQiIHJ5PSIxMC44IiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjQ0Ii8+PGVsbGlwc2UgY3g9IjUwMy4xIiBjeT0iMTgxLjciIHJ4PSI5LjgiIHJ5PSI2LjkiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNTkiLz48ZWxsaXBzZSBjeD0iMzIuNCIgY3k9IjQwLjAiIHJ4PSIxMC42IiByeT0iNy40IiBmaWxsPSIjNkI0NDI2IiBvcGFjaXR5PSIwLjYwIi8+PGVsbGlwc2UgY3g9IjEyNS4wIiBjeT0iNzM4LjMiIHJ4PSIxNi44IiByeT0iMTEuOCIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC41MyIvPjxlbGxpcHNlIGN4PSIxODIuMSIgY3k9IjQ5Ny45IiByeD0iMTYuMyIgcnk9IjExLjQiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuNTciLz48ZWxsaXBzZSBjeD0iNDYwLjIiIGN5PSI5MzUuNyIgcng9IjkuOCIgcnk9IjYuOSIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC42NiIvPjxlbGxpcHNlIGN4PSI3MDAuMSIgY3k9IjU4NS4xIiByeD0iMTkuMSIgcnk9IjEzLjQiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNTciLz48ZWxsaXBzZSBjeD0iMjkuNyIgY3k9IjMxOC42IiByeD0iMjAuNCIgcnk9IjE0LjMiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuNjAiLz48ZWxsaXBzZSBjeD0iNjguOSIgY3k9IjY5NC43IiByeD0iMTQuMyIgcnk9IjEwLjAiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNDEiLz48ZWxsaXBzZSBjeD0iNzEuOSIgY3k9Ijk0Ni40IiByeD0iMTQuOCIgcnk9IjEwLjMiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuNTgiLz48ZWxsaXBzZSBjeD0iNTkwLjkiIGN5PSI4MzAuMCIgcng9IjE4LjAiIHJ5PSIxMi42IiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjUwIi8+PGVsbGlwc2UgY3g9IjU0MS4zIiBjeT0iMjA2LjAiIHJ4PSIxOC44IiByeT0iMTMuMSIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC41MCIvPjxlbGxpcHNlIGN4PSIxNTEuNCIgY3k9Ijk1Mi4zIiByeD0iMjEuMiIgcnk9IjE0LjgiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuMzciLz48ZWxsaXBzZSBjeD0iMTMxLjAiIGN5PSI3ODAuOSIgcng9IjExLjgiIHJ5PSI4LjIiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuNDAiLz48ZWxsaXBzZSBjeD0iNDcuNSIgY3k9IjM1Ny44IiByeD0iMTQuNiIgcnk9IjEwLjIiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNTUiLz48ZWxsaXBzZSBjeD0iMTA5LjgiIGN5PSI2ODYuMiIgcng9IjE1LjgiIHJ5PSIxMS4wIiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjQwIi8+PGVsbGlwc2UgY3g9IjE5My40IiBjeT0iNTE1LjQiIHJ4PSIxNS4xIiByeT0iMTAuNiIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC41OCIvPjxlbGxpcHNlIGN4PSIxMDYuNyIgY3k9IjcwNy43IiByeD0iMTcuNCIgcnk9IjEyLjIiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNDMiLz48ZWxsaXBzZSBjeD0iNjUyLjMiIGN5PSI1NDguMyIgcng9IjIwLjIiIHJ5PSIxNC4xIiBmaWxsPSIjNkI0NDI2IiBvcGFjaXR5PSIwLjU3Ii8+PGVsbGlwc2UgY3g9IjEyMy44IiBjeT0iOTc5LjMiIHJ4PSIyMS40IiByeT0iMTUuMCIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC42MyIvPjxlbGxpcHNlIGN4PSI5MS42IiBjeT0iMjg5LjMiIHJ4PSIxMy44IiByeT0iOS42IiBmaWxsPSIjNkI0NDI2IiBvcGFjaXR5PSIwLjMyIi8+PGVsbGlwc2UgY3g9IjcxNi42IiBjeT0iMzAzLjkiIHJ4PSI5LjgiIHJ5PSI2LjgiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuNDgiLz48ZWxsaXBzZSBjeD0iOTAuNCIgY3k9IjMyNC41IiByeD0iMTUuNSIgcnk9IjEwLjgiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuNDIiLz48ZWxsaXBzZSBjeD0iNDQ2LjAiIGN5PSI0NS42IiByeD0iMTUuNSIgcnk9IjEwLjgiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuMzMiLz48ZWxsaXBzZSBjeD0iNTczLjciIGN5PSI5ODAuMiIgcng9IjE3LjAiIHJ5PSIxMS45IiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjU2Ii8+PGVsbGlwc2UgY3g9Ijc2NS40IiBjeT0iNDg4LjMiIHJ4PSIyMC41IiByeT0iMTQuNCIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC4zMCIvPjxlbGxpcHNlIGN4PSI3MzUuNiIgY3k9IjY0NC41IiByeD0iMTguMCIgcnk9IjEyLjYiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuNTYiLz48ZWxsaXBzZSBjeD0iNjIuNSIgY3k9Ijc0Ny40IiByeD0iOC40IiByeT0iNS45IiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjY0Ii8+PGVsbGlwc2UgY3g9IjIzNy4xIiBjeT0iMTg1LjciIHJ4PSIxOC4yIiByeT0iMTIuNyIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC4zNCIvPjxlbGxpcHNlIGN4PSI1NzUuMSIgY3k9IjMxMC4zIiByeD0iMTcuOSIgcnk9IjEyLjUiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuMzciLz48ZWxsaXBzZSBjeD0iNjYwLjMiIGN5PSIzMjAuMiIgcng9IjEzLjkiIHJ5PSI5LjciIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuNjQiLz48ZWxsaXBzZSBjeD0iMjAyLjgiIGN5PSI1Ny43IiByeD0iOS43IiByeT0iNi44IiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjY2Ii8+PGVsbGlwc2UgY3g9Ijc1NS45IiBjeT0iNDk0LjQiIHJ4PSIxNi4wIiByeT0iMTEuMiIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC43MCIvPjxlbGxpcHNlIGN4PSI0ODIuMSIgY3k9IjYyNi41IiByeD0iMTAuMyIgcnk9IjcuMiIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC4zNyIvPjxlbGxpcHNlIGN4PSIzNTQuNiIgY3k9Ijk2OS44IiByeD0iOS40IiByeT0iNi42IiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjY0Ii8+PGVsbGlwc2UgY3g9IjM4My41IiBjeT0iMjE4LjMiIHJ4PSIxNC4wIiByeT0iOS44IiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjY0Ii8+PGVsbGlwc2UgY3g9IjY4NC4zIiBjeT0iNzg2LjkiIHJ4PSIxNC44IiByeT0iMTAuNCIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC4zMyIvPjxlbGxpcHNlIGN4PSI0NC4yIiBjeT0iNzEwLjgiIHJ4PSIyMi4yIiByeT0iMTUuNiIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC40OCIvPjxlbGxpcHNlIGN4PSI1MzIuOSIgY3k9IjgyNi4xIiByeD0iMjIuNSIgcnk9IjE1LjciIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNDUiLz48ZWxsaXBzZSBjeD0iMy40IiBjeT0iODA0LjIiIHJ4PSIxOC44IiByeT0iMTMuMiIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC40OSIvPjxlbGxpcHNlIGN4PSI0MzQuMiIgY3k9IjUxNi44IiByeD0iMTQuOSIgcnk9IjEwLjQiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNjkiLz48ZWxsaXBzZSBjeD0iNzY5LjUiIGN5PSI2MTkuOSIgcng9IjIxLjAiIHJ5PSIxNC43IiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjU5Ii8+PGVsbGlwc2UgY3g9IjI2NS4yIiBjeT0iNjU4LjQiIHJ4PSIxNy4wIiByeT0iMTEuOSIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC42OCIvPjxlbGxpcHNlIGN4PSIzODQuNiIgY3k9IjY0Ny40IiByeD0iMTIuOCIgcnk9IjkuMCIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC41MSIvPjxlbGxpcHNlIGN4PSI1MDcuMCIgY3k9Ijg0OC4xIiByeD0iMTEuNiIgcnk9IjguMSIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC41OCIvPjxlbGxpcHNlIGN4PSIxMTcuNSIgY3k9IjU3OS4xIiByeD0iMTYuOSIgcnk9IjExLjgiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuNDQiLz48ZWxsaXBzZSBjeD0iMTkyLjIiIGN5PSI0NDEuNCIgcng9IjEyLjIiIHJ5PSI4LjUiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuMzciLz48ZWxsaXBzZSBjeD0iNzEyLjAiIGN5PSI1NDguMSIgcng9IjkuOCIgcnk9IjYuOSIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC41NiIvPjxlbGxpcHNlIGN4PSIxNTAuMCIgY3k9IjY3MC4yIiByeD0iMTkuMyIgcnk9IjEzLjUiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNTIiLz48ZWxsaXBzZSBjeD0iMTgxLjIiIGN5PSI1NzIuNyIgcng9IjkuOCIgcnk9IjYuOSIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC42NCIvPjxlbGxpcHNlIGN4PSI1NDMuNiIgY3k9IjgwMC4zIiByeD0iMTAuMSIgcnk9IjcuMSIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC41NSIvPjxlbGxpcHNlIGN4PSI3NjguMyIgY3k9IjUxNS4yIiByeD0iMTUuNCIgcnk9IjEwLjgiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuNTIiLz48ZWxsaXBzZSBjeD0iNzc0LjQiIGN5PSIxOTEuNiIgcng9IjE1LjYiIHJ5PSIxMC45IiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjM1Ii8+PGVsbGlwc2UgY3g9IjYyMC45IiBjeT0iNTcuNiIgcng9IjExLjgiIHJ5PSI4LjMiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuMzIiLz48ZWxsaXBzZSBjeD0iNTYxLjUiIGN5PSI5NTUuNiIgcng9IjE1LjQiIHJ5PSIxMC43IiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjU4Ii8+PGVsbGlwc2UgY3g9IjM0MC44IiBjeT0iODg4LjYiIHJ4PSIxNy45IiByeT0iMTIuNiIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC41MyIvPjxlbGxpcHNlIGN4PSI3MzQuMCIgY3k9Ijg3MC44IiByeD0iMTAuNyIgcnk9IjcuNSIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC42MiIvPjxlbGxpcHNlIGN4PSI1ODguOSIgY3k9IjExLjYiIHJ4PSIxMi4xIiByeT0iOC41IiBmaWxsPSIjNkI0NDI2IiBvcGFjaXR5PSIwLjQ1Ii8+PGVsbGlwc2UgY3g9IjU4OS44IiBjeT0iOTQ4LjAiIHJ4PSIxOS41IiByeT0iMTMuNyIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC42MyIvPjxlbGxpcHNlIGN4PSIyODIuOCIgY3k9IjM1NS43IiByeD0iMTMuMiIgcnk9IjkuMyIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC4zMSIvPjxlbGxpcHNlIGN4PSI3MjguMiIgY3k9IjI0Mi40IiByeD0iMTMuNyIgcnk9IjkuNiIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC4zMSIvPjxlbGxpcHNlIGN4PSI3OTEuMCIgY3k9IjQzOS45IiByeD0iMjAuNyIgcnk9IjE0LjUiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuMzQiLz48ZWxsaXBzZSBjeD0iNjQwLjYiIGN5PSIxODUuMyIgcng9IjE2LjkiIHJ5PSIxMS44IiBmaWxsPSIjM0EyQTE4IiBvcGFjaXR5PSIwLjY1Ii8+PGVsbGlwc2UgY3g9IjUzNS43IiBjeT0iODM2LjIiIHJ4PSIxNy40IiByeT0iMTIuMiIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC41MiIvPjxlbGxpcHNlIGN4PSI1NTEuNiIgY3k9IjgwOC4yIiByeD0iMjMuMiIgcnk9IjE2LjIiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuMzEiLz48ZWxsaXBzZSBjeD0iNzk1LjYiIGN5PSI0ODcuMiIgcng9IjE1LjciIHJ5PSIxMS4wIiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjYyIi8+PGVsbGlwc2UgY3g9IjI4LjQiIGN5PSIxODIuMyIgcng9IjIxLjEiIHJ5PSIxNC44IiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjY0Ii8+PGVsbGlwc2UgY3g9Ijc3NC4wIiBjeT0iNjkyLjkiIHJ4PSIxNS4yIiByeT0iMTAuNiIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC42NSIvPjxlbGxpcHNlIGN4PSI0ODguNyIgY3k9Ijc1LjkiIHJ4PSIxMy4zIiByeT0iOS4zIiBmaWxsPSIjNkI0NDI2IiBvcGFjaXR5PSIwLjQyIi8+PGVsbGlwc2UgY3g9IjEwNC43IiBjeT0iNjI0LjYiIHJ4PSIxMS40IiByeT0iOC4wIiBmaWxsPSIjM0EyQTE4IiBvcGFjaXR5PSIwLjU5Ii8+PGVsbGlwc2UgY3g9IjI2NS4xIiBjeT0iNDY4LjQiIHJ4PSIyMy4wIiByeT0iMTYuMSIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC4zMCIvPjxlbGxpcHNlIGN4PSI0NjMuMyIgY3k9IjMzMy44IiByeD0iOC4zIiByeT0iNS44IiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjY1Ii8+PGVsbGlwc2UgY3g9IjQ4Ni45IiBjeT0iNjMwLjkiIHJ4PSIxOS42IiByeT0iMTMuNyIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC40MSIvPjxlbGxpcHNlIGN4PSIyMTguNyIgY3k9IjUwMC4wIiByeD0iMTIuMiIgcnk9IjguNSIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC43MCIvPjxlbGxpcHNlIGN4PSIyNy4zIiBjeT0iNTYwLjYiIHJ4PSIyMC4zIiByeT0iMTQuMiIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC42MSIvPjxlbGxpcHNlIGN4PSI1MDYuNSIgY3k9IjYzNC42IiByeD0iMTMuOCIgcnk9IjkuNyIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC42MiIvPjxlbGxpcHNlIGN4PSIxOTAuNCIgY3k9Ijc5Ni43IiByeD0iMTAuMyIgcnk9IjcuMiIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC40MiIvPjxlbGxpcHNlIGN4PSI2MTAuNyIgY3k9IjczOS41IiByeD0iMTYuMSIgcnk9IjExLjMiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNDQiLz48ZWxsaXBzZSBjeD0iNDQwLjYiIGN5PSI0MDYuMCIgcng9IjkuMCIgcnk9IjYuMyIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC41NyIvPjxlbGxpcHNlIGN4PSI3MDYuOSIgY3k9Ijc4Mi42IiByeD0iMTYuMSIgcnk9IjExLjIiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNjIiLz48ZWxsaXBzZSBjeD0iNzk3LjMiIGN5PSIxNTAuOCIgcng9IjExLjMiIHJ5PSI3LjkiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuNDYiLz48ZWxsaXBzZSBjeD0iMzE2LjkiIGN5PSI3NzIuMyIgcng9IjIyLjkiIHJ5PSIxNi4wIiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjM2Ii8+PGVsbGlwc2UgY3g9IjU3NS45IiBjeT0iMjUyLjEiIHJ4PSIxNy4yIiByeT0iMTIuMCIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC4zMyIvPjxlbGxpcHNlIGN4PSIxNTIuMiIgY3k9IjkyNC44IiByeD0iMTcuNCIgcnk9IjEyLjIiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuNTMiLz48ZWxsaXBzZSBjeD0iNzkwLjAiIGN5PSIzNTcuMCIgcng9IjIwLjQiIHJ5PSIxNC4zIiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjU5Ii8+PGVsbGlwc2UgY3g9IjczNy42IiBjeT0iODM4LjYiIHJ4PSIxMy4xIiByeT0iOS4yIiBmaWxsPSIjNkI0NDI2IiBvcGFjaXR5PSIwLjQxIi8+PGVsbGlwc2UgY3g9IjIwNi4wIiBjeT0iMjMuMSIgcng9IjEwLjYiIHJ5PSI3LjQiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuMzkiLz48ZWxsaXBzZSBjeD0iMTYuMSIgY3k9IjQ3LjciIHJ4PSIxNS4yIiByeT0iMTAuNiIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC42NSIvPjxlbGxpcHNlIGN4PSI1MTguNSIgY3k9IjE5Ni43IiByeD0iMTkuNyIgcnk9IjEzLjgiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNTQiLz48ZWxsaXBzZSBjeD0iNjMuNCIgY3k9IjgwOS41IiByeD0iMjIuMCIgcnk9IjE1LjQiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuNTkiLz48ZWxsaXBzZSBjeD0iNC4wIiBjeT0iMjcwLjYiIHJ4PSIxOC4zIiByeT0iMTIuOCIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC41NiIvPjxlbGxpcHNlIGN4PSI3MzguMyIgY3k9IjIxMi4yIiByeD0iMTMuMiIgcnk9IjkuMyIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC41NiIvPjxlbGxpcHNlIGN4PSIzMjQuMyIgY3k9IjY3OS4wIiByeD0iMTMuNCIgcnk9IjkuNCIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC42NSIvPjxlbGxpcHNlIGN4PSI2MzcuMCIgY3k9Ijg3LjIiIHJ4PSIxNy44IiByeT0iMTIuNSIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC43MCIvPjxlbGxpcHNlIGN4PSIzMTkuNiIgY3k9Ijk0MC4yIiByeD0iMjIuMCIgcnk9IjE1LjQiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuNjciLz48ZWxsaXBzZSBjeD0iNDUxLjMiIGN5PSI5ODcuNSIgcng9IjguOSIgcnk9IjYuMiIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC4zNiIvPjxlbGxpcHNlIGN4PSIxNC45IiBjeT0iMjEwLjUiIHJ4PSIxNi41IiByeT0iMTEuNSIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC40NCIvPjxlbGxpcHNlIGN4PSIyODkuNCIgY3k9IjM0NC4xIiByeD0iMTguOSIgcnk9IjEzLjIiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNTYiLz48ZWxsaXBzZSBjeD0iNDgxLjMiIGN5PSIzMzAuOCIgcng9IjE5LjkiIHJ5PSIxMy45IiBmaWxsPSIjM0EyQTE4IiBvcGFjaXR5PSIwLjYzIi8+PGVsbGlwc2UgY3g9IjM4Mi4wIiBjeT0iMzEuNiIgcng9IjE4LjQiIHJ5PSIxMi44IiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjUyIi8+PGVsbGlwc2UgY3g9IjI4OS4xIiBjeT0iNTI5LjYiIHJ4PSIxMi40IiByeT0iOC43IiBmaWxsPSIjM0EyQTE4IiBvcGFjaXR5PSIwLjMwIi8+PGVsbGlwc2UgY3g9IjM4MC42IiBjeT0iNjU1LjQiIHJ4PSIyMC40IiByeT0iMTQuMyIgZmlsbD0iIzNBMkExOCIgb3BhY2l0eT0iMC4zNiIvPjxlbGxpcHNlIGN4PSI1MDMuMSIgY3k9IjQwMC44IiByeD0iMjMuNyIgcnk9IjE2LjYiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuNTUiLz48ZWxsaXBzZSBjeD0iOTcuOCIgY3k9IjU0My4zIiByeD0iMTEuMyIgcnk9IjcuOSIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC40MCIvPjxlbGxpcHNlIGN4PSI0ODQuOSIgY3k9IjczNy42IiByeD0iMjIuNCIgcnk9IjE1LjciIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNTEiLz48ZWxsaXBzZSBjeD0iMjgwLjciIGN5PSI3MDkuNiIgcng9IjE1LjEiIHJ5PSIxMC41IiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjM5Ii8+PGVsbGlwc2UgY3g9IjcyOS45IiBjeT0iOTAxLjAiIHJ4PSIxNC4yIiByeT0iMTAuMCIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC40MyIvPjxlbGxpcHNlIGN4PSI3MjIuOCIgY3k9IjEwNy44IiByeD0iMTkuNyIgcnk9IjEzLjgiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuNjIiLz48ZWxsaXBzZSBjeD0iNzMwLjkiIGN5PSI2NzQuMiIgcng9IjEzLjYiIHJ5PSI5LjUiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNTMiLz48ZWxsaXBzZSBjeD0iMzI3LjkiIGN5PSI5MTkuMSIgcng9IjIzLjEiIHJ5PSIxNi4yIiBmaWxsPSIjNkI0NDI2IiBvcGFjaXR5PSIwLjMxIi8+PGVsbGlwc2UgY3g9IjE2LjYiIGN5PSI3MDkuMyIgcng9IjExLjkiIHJ5PSI4LjMiIGZpbGw9IiMzQTJBMTgiIG9wYWNpdHk9IjAuMzgiLz48ZWxsaXBzZSBjeD0iNjA3LjMiIGN5PSI2NDIuNyIgcng9IjEyLjgiIHJ5PSI4LjkiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuMzkiLz48ZWxsaXBzZSBjeD0iNDU1LjYiIGN5PSIxNTYuNyIgcng9IjIxLjgiIHJ5PSIxNS4zIiBmaWxsPSIjM0EyQTE4IiBvcGFjaXR5PSIwLjY4Ii8+PGVsbGlwc2UgY3g9IjEwOS4yIiBjeT0iMzAwLjEiIHJ4PSI5LjQiIHJ5PSI2LjYiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuNDkiLz48ZWxsaXBzZSBjeD0iNzEyLjgiIGN5PSIxNjEuNiIgcng9IjE4LjkiIHJ5PSIxMy4yIiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjM4Ii8+PGVsbGlwc2UgY3g9IjQxLjciIGN5PSI3ODIuMiIgcng9IjIxLjYiIHJ5PSIxNS4xIiBmaWxsPSIjM0EyQTE4IiBvcGFjaXR5PSIwLjMyIi8+PGVsbGlwc2UgY3g9IjYxOS4yIiBjeT0iNDM5LjEiIHJ4PSIxNS4wIiByeT0iMTAuNSIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC43MCIvPjxlbGxpcHNlIGN4PSIyMzguMSIgY3k9IjI0LjQiIHJ4PSI5LjgiIHJ5PSI2LjgiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuMzUiLz48ZWxsaXBzZSBjeD0iMjQyLjIiIGN5PSI1MDIuNiIgcng9IjEzLjYiIHJ5PSI5LjUiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNDkiLz48ZWxsaXBzZSBjeD0iMzE3LjciIGN5PSI0MTQuMiIgcng9IjE4LjMiIHJ5PSIxMi44IiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjY1Ii8+PGVsbGlwc2UgY3g9Ijc4My43IiBjeT0iMzIuOSIgcng9IjExLjgiIHJ5PSI4LjIiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuMzIiLz48ZWxsaXBzZSBjeD0iNDAzLjgiIGN5PSIyMzEuNiIgcng9IjE0LjkiIHJ5PSIxMC40IiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjU5Ii8+PGVsbGlwc2UgY3g9IjM4LjciIGN5PSI4OTQuMCIgcng9IjkuMCIgcnk9IjYuMyIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC4zNSIvPjxlbGxpcHNlIGN4PSIzODkuOSIgY3k9IjEzNS44IiByeD0iMTQuOSIgcnk9IjEwLjQiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuMzkiLz48ZWxsaXBzZSBjeD0iNDMyLjQiIGN5PSI2MzMuMiIgcng9IjE2LjciIHJ5PSIxMS43IiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjUxIi8+PGVsbGlwc2UgY3g9IjY3MS43IiBjeT0iOTU3LjIiIHJ4PSI5LjIiIHJ5PSI2LjUiIGZpbGw9IiM2QjQ0MjYiIG9wYWNpdHk9IjAuNjQiLz48ZWxsaXBzZSBjeD0iNzc3LjciIGN5PSIyMjQuMCIgcng9IjkuMiIgcnk9IjYuNCIgZmlsbD0iIzZCNDQyNiIgb3BhY2l0eT0iMC4zMSIvPjxlbGxpcHNlIGN4PSIyMTUuMiIgY3k9Ijk2Ni4zIiByeD0iMTEuMSIgcnk9IjcuOCIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC40NiIvPjxlbGxpcHNlIGN4PSI0NDUuMyIgY3k9IjM2Mi42IiByeD0iOC4yIiByeT0iNS43IiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjU2Ii8+PHBhdGggZD0iTTQ5Ni4wIDUwLjAgQyA0NjMuOTk5OTk5OTk5OTk5OTQgMzAwLjAgNTI4LjAgNTUwLjAgNDgwLjAgODAwLjAiIHN0cm9rZT0iIzRBNTYzOCIgc3Ryb2tlLXdpZHRoPSIxNiIgZmlsbD0ibm9uZSIgb3BhY2l0eT0iMC41Ii8+PGVsbGlwc2UgY3g9IjE2MC4wIiBjeT0iODAuMCIgcng9IjMwMCIgcnk9IjIyMCIgZmlsbD0iI0YzRUVFMSIgb3BhY2l0eT0iMC4wNyIvPjwvZz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjEwMDAiIGZpbGw9InVybCgjdmlnKSIvPgogIDxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iMTAwMCIgZmlsdGVyPSJ1cmwoI2dyYWluRikiLz4KPC9zdmc+" alt="Detail mulče kolem záhonu"></div>
+      <div class="service-copy">
+        <span class="eyebrow on-cream">02 — Mulčování</span>
+        <h3>Mulčování záhonů i trávníku</h3>
+        <p>Mulč drží vláhu, tlumí plevel a půdě dodává výživu — u trávníku i okrasných záhonů.</p>
+        <ul class="service-list">
+          <li><span>Vhodné pro</span><span>Záhony, stromy, svahy</span></li>
+          <li><span>Přínos</span><span>Méně zalévání, méně plevele</span></li>
+          <li><span>Materiál</span><span>Doporučíme podle plochy</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="service-pair reveal">
+      <div class="service-media"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAwIDEwMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQgc2xpY2UiPgogIDxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iYmciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMTAxOTE1Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzFBMkEyMiIvPgogICAgPC9saW5lYXJHcmFkaWVudD48ZmlsdGVyIGlkPSJibHVyRiIgeD0iLTQwJSIgeT0iLTQwJSIgd2lkdGg9IjE4MCUiIGhlaWdodD0iMTgwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iOSIvPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9ImdyYWluRiIgeD0iLTIwJSIgeT0iLTIwJSIgd2lkdGg9IjE0MCUiIGhlaWdodD0iMTQwJSI+CiAgICAgIDxmZVR1cmJ1bGVuY2UgdHlwZT0iZnJhY3RhbE5vaXNlIiBiYXNlRnJlcXVlbmN5PSIxLjAiIG51bU9jdGF2ZXM9IjIiIHNlZWQ9IjE2MCIgcmVzdWx0PSJuIi8+CiAgICAgIDxmZUNvbG9yTWF0cml4IGluPSJuIiB0eXBlPSJtYXRyaXgiIHZhbHVlcz0iMCAwIDAgMCAwICAwIDAgMCAwIDAgIDAgMCAwIDAgMCAgMCAwIDAgMC4wNSAwIi8+CiAgICA8L2ZpbHRlcj48cmFkaWFsR3JhZGllbnQgaWQ9InZpZyIgY3g9IjUwJSIgY3k9IjQ2JSIgcj0iNzAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSI1NSUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+CiAgICA8L3JhZGlhbEdyYWRpZW50PjwvZGVmcz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjEwMDAiIGZpbGw9InVybCgjYmcpIi8+CiAgPGcgZmlsdGVyPSJ1cmwoI2JsdXJGKSI+PHJlY3QgeD0iMCIgeT0iNTUwLjAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNDUwLjAiIGZpbGw9IiMyRTM2MjQiIG9wYWNpdHk9IjAuNTUiLz48ZWxsaXBzZSBjeD0iNDAwLjAiIGN5PSI1ODAuMCIgcng9IjI2MCIgcnk9IjE4MCIgZmlsbD0iI0YzRUVFMSIgb3BhY2l0eT0iMC4xNCIvPjxlbGxpcHNlIGN4PSI0MDAuMCIgY3k9IjU4MC4wIiByeD0iMTQwIiByeT0iOTAiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMTgiLz48Y2lyY2xlIGN4PSIyNjAuNiIgY3k9IjI3Mi4wIiByPSI2LjUiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuNTUiLz48Y2lyY2xlIGN4PSI1NTcuMCIgY3k9IjIzOS43IiByPSI2LjUiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuNDEiLz48Y2lyY2xlIGN4PSIzMjUuMSIgY3k9IjE3OC42IiByPSI4LjYiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuNTEiLz48Y2lyY2xlIGN4PSI1OTQuNCIgY3k9IjU2Ny4wIiByPSI3LjgiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMzIiLz48Y2lyY2xlIGN4PSI0MDAuNyIgY3k9IjYxNC4xIiByPSI4LjIiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuNDciLz48Y2lyY2xlIGN4PSI3MTQuMiIgY3k9IjUyOS4zIiByPSI4LjAiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMjgiLz48Y2lyY2xlIGN4PSI0NzcuMyIgY3k9IjExNy41IiByPSI4LjMiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMzciLz48Y2lyY2xlIGN4PSI0MzcuNSIgY3k9IjQ1Ni4xIiByPSI2LjciIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuNDUiLz48Y2lyY2xlIGN4PSIzNzEuNSIgY3k9IjQwMC40IiByPSI2LjgiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuNDQiLz48Y2lyY2xlIGN4PSIzODEuMiIgY3k9IjI3OC4wIiByPSI3LjMiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMzYiLz48Y2lyY2xlIGN4PSI2MDguMCIgY3k9IjUxMS41IiByPSI5LjIiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMzYiLz48Y2lyY2xlIGN4PSIxMjEuMCIgY3k9IjYwNy41IiByPSI1LjYiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuNDUiLz48Y2lyY2xlIGN4PSI2MDguOCIgY3k9IjEzNy40IiByPSI4LjgiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuNDUiLz48Y2lyY2xlIGN4PSI2NzEuMyIgY3k9IjQ5OC4wIiByPSI1LjYiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuNTAiLz48Y2lyY2xlIGN4PSI2MjguOSIgY3k9IjI4MC44IiByPSI3LjUiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuNDIiLz48Y2lyY2xlIGN4PSI3MTkuNiIgY3k9IjEzNC4yIiByPSI4LjUiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMzYiLz48Y2lyY2xlIGN4PSIyMTEuMSIgY3k9IjE4Ny45IiByPSI2LjIiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuNDUiLz48Y2lyY2xlIGN4PSIxNzcuNiIgY3k9IjQ0NC4xIiByPSI1LjEiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuNTMiLz48Y2lyY2xlIGN4PSI2MjcuNyIgY3k9IjQzOS4xIiByPSI5LjUiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMzUiLz48Y2lyY2xlIGN4PSIzMTEuNSIgY3k9IjU0OS4xIiByPSI2LjYiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMzciLz48Y2lyY2xlIGN4PSI1MjkuNyIgY3k9IjI5NS4xIiByPSI2LjIiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuNDUiLz48Y2lyY2xlIGN4PSI0MTQuNSIgY3k9IjI1Ny4yIiByPSI4LjAiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMzMiLz48Y2lyY2xlIGN4PSIyNjUuOSIgY3k9IjMzMi4wIiByPSI0LjciIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuNDQiLz48Y2lyY2xlIGN4PSI1NDcuNiIgY3k9IjE5MC43IiByPSI3LjEiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMjUiLz48Y2lyY2xlIGN4PSIxNjMuNSIgY3k9IjM1NC4yIiByPSI4LjAiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuNDQiLz48Y2lyY2xlIGN4PSI0MTUuMCIgY3k9IjUxNi44IiByPSI1LjUiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuNDIiLz48Y2lyY2xlIGN4PSI4MC41IiBjeT0iMjM1LjAiIHI9IjcuNSIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4zNCIvPjxjaXJjbGUgY3g9IjQyOC42IiBjeT0iNTc2LjgiIHI9IjUuNSIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4zMyIvPjxjaXJjbGUgY3g9IjM2MC40IiBjeT0iMzczLjEiIHI9IjcuMCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yOCIvPjxjaXJjbGUgY3g9IjE2Mi4xIiBjeT0iNTk4LjQiIHI9IjUuNyIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC40OCIvPjxjaXJjbGUgY3g9IjY2OS4xIiBjeT0iNDczLjEiIHI9IjYuMyIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yNiIvPjxjaXJjbGUgY3g9IjU2Mi4wIiBjeT0iNjA0LjMiIHI9IjYuNiIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC40MyIvPjxjaXJjbGUgY3g9IjI0NC4zIiBjeT0iMjI0LjEiIHI9IjkuMSIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yOSIvPjxjaXJjbGUgY3g9IjQ3NS45IiBjeT0iNjA4LjQiIHI9IjkuMSIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC40MiIvPjxjaXJjbGUgY3g9IjEyMC41IiBjeT0iMjA1LjYiIHI9IjkuMiIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yNyIvPjxjaXJjbGUgY3g9IjM2NS4xIiBjeT0iMzA0LjUiIHI9IjYuNSIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC41MyIvPjxjaXJjbGUgY3g9IjQ5MS41IiBjeT0iNTExLjYiIHI9IjQuNiIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC40MiIvPjxjaXJjbGUgY3g9IjY3OC40IiBjeT0iNDY0LjUiIHI9IjYuNiIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC41NSIvPjxjaXJjbGUgY3g9IjE5Mi44IiBjeT0iMTMzLjgiIHI9IjYuNCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yOSIvPjxjaXJjbGUgY3g9IjU2MS44IiBjeT0iMTA0LjkiIHI9IjUuNCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4zMSIvPjxjaXJjbGUgY3g9IjQyNi43IiBjeT0iNTgxLjQiIHI9IjUuOCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4zNSIvPjxjaXJjbGUgY3g9IjMyOC4wIiBjeT0iMzM5LjEiIHI9IjQuNSIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC41MCIvPjxjaXJjbGUgY3g9IjQ0NS41IiBjeT0iMTA4LjAiIHI9IjcuMCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC41MCIvPjxjaXJjbGUgY3g9IjIxOC4wIiBjeT0iMzM2LjIiIHI9IjguOSIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4zMSIvPjxjaXJjbGUgY3g9IjI5NC44IiBjeT0iNTQ4LjgiIHI9IjcuMyIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC40NyIvPjxjaXJjbGUgY3g9IjYxOS45IiBjeT0iMTcyLjkiIHI9IjYuNCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yNyIvPjxjaXJjbGUgY3g9IjQ4MS4wIiBjeT0iMjY2LjciIHI9IjUuMSIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC41NCIvPjxjaXJjbGUgY3g9IjE5OS4xIiBjeT0iMzgwLjIiIHI9IjcuMSIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yOCIvPjxjaXJjbGUgY3g9IjMyNS42IiBjeT0iNDQ1LjMiIHI9IjUuOCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4zNyIvPjxjaXJjbGUgY3g9IjY0Ni45IiBjeT0iNDU0LjIiIHI9IjUuOCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4zMiIvPjxjaXJjbGUgY3g9IjMyMy4zIiBjeT0iMzI2LjgiIHI9IjcuMiIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4zNCIvPjxjaXJjbGUgY3g9IjE2NC4zIiBjeT0iMjA3LjkiIHI9IjcuOSIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC41MyIvPjxjaXJjbGUgY3g9IjUwMC4wIiBjeT0iNDY5LjEiIHI9IjQuOCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC41MyIvPjxjaXJjbGUgY3g9IjI5OC43IiBjeT0iMzM3LjMiIHI9IjguMiIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC40NSIvPjxjaXJjbGUgY3g9IjU0Ni43IiBjeT0iMTA0LjQiIHI9IjQuNCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC41NCIvPjxjaXJjbGUgY3g9IjYwNy4wIiBjeT0iMTE4LjQiIHI9IjUuMyIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4zOCIvPjxjaXJjbGUgY3g9IjIwOC40IiBjeT0iMjA4LjkiIHI9IjkuOCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC40MyIvPjxjaXJjbGUgY3g9IjMzOS44IiBjeT0iNDc4LjUiIHI9IjUuMiIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4zMSIvPjxjaXJjbGUgY3g9IjE5NS4zIiBjeT0iNTQ2LjIiIHI9IjQuNyIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yOSIvPjxjaXJjbGUgY3g9IjY0My4yIiBjeT0iNTIzLjQiIHI9IjcuMCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yNSIvPjxjaXJjbGUgY3g9IjU0MS42IiBjeT0iNDgzLjMiIHI9IjUuMCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4zMiIvPjxjaXJjbGUgY3g9IjU0MS4xIiBjeT0iNDg5LjMiIHI9IjguOCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC40MSIvPjxjaXJjbGUgY3g9IjE4MS43IiBjeT0iNTA0LjMiIHI9IjguMyIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC40MCIvPjxjaXJjbGUgY3g9IjM3OC4wIiBjeT0iMjA0LjgiIHI9IjQuNSIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yNyIvPjxjaXJjbGUgY3g9IjIyMy4yIiBjeT0iNTMzLjUiIHI9IjguMiIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4zOCIvPjxjaXJjbGUgY3g9IjM1MS43IiBjeT0iNTUxLjUiIHI9IjkuNSIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yOSIvPjxjaXJjbGUgY3g9IjE4Mi41IiBjeT0iMzMyLjEiIHI9IjguNSIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC41MSIvPjxjaXJjbGUgY3g9IjU5MC4yIiBjeT0iNDY3LjYiIHI9IjguMyIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4zNCIvPjxjaXJjbGUgY3g9IjI0NS4xIiBjeT0iMzg1LjMiIHI9IjUuMyIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC41MyIvPjxjaXJjbGUgY3g9IjUwNS44IiBjeT0iMjIwLjAiIHI9IjkuOCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4zNSIvPjwvZz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjEwMDAiIGZpbGw9InVybCgjdmlnKSIvPgogIDxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iMTAwMCIgZmlsdGVyPSJ1cmwoI2dyYWluRikiLz4KPC9zdmc+" alt="Zavlažovací postřikovač v trávníku"></div>
+      <div class="service-copy">
+        <span class="eyebrow on-cream">03 — Zavlažovací systémy</span>
+        <h3>Automatické zavlažování</h3>
+        <p>Návrh a instalace závlahy šité na míru tvaru a slunci vaší zahrady, tak aby se zalévalo rovnoměrně a bez dohledu.</p>
+        <ul class="service-list">
+          <li><span>Řešení</span><span>Postřikovače i kapková závlaha</span></li>
+          <li><span>Ovládání</span><span>Automatický harmonogram</span></li>
+          <li><span>Servis</span><span>Kontrola a seřízení systému</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="service-pair reveal">
+      <div class="service-media"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgODAwIDEwMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQgc2xpY2UiPgogIDxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iYmciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMTcxMzEwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzIzMUMxNSIvPgogICAgPC9saW5lYXJHcmFkaWVudD48ZmlsdGVyIGlkPSJibHVyRiIgeD0iLTQwJSIgeT0iLTQwJSIgd2lkdGg9IjE4MCUiIGhlaWdodD0iMTgwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iOCIvPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9ImdyYWluRiIgeD0iLTIwJSIgeT0iLTIwJSIgd2lkdGg9IjE0MCUiIGhlaWdodD0iMTQwJSI+CiAgICAgIDxmZVR1cmJ1bGVuY2UgdHlwZT0iZnJhY3RhbE5vaXNlIiBiYXNlRnJlcXVlbmN5PSIxLjAiIG51bU9jdGF2ZXM9IjIiIHNlZWQ9IjQ1MyIgcmVzdWx0PSJuIi8+CiAgICAgIDxmZUNvbG9yTWF0cml4IGluPSJuIiB0eXBlPSJtYXRyaXgiIHZhbHVlcz0iMCAwIDAgMCAwICAwIDAgMCAwIDAgIDAgMCAwIDAgMCAgMCAwIDAgMC4wNiAwIi8+CiAgICA8L2ZpbHRlcj48cmFkaWFsR3JhZGllbnQgaWQ9InZpZyIgY3g9IjUwJSIgY3k9IjQ2JSIgcj0iNzAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSI1NSUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+CiAgICA8L3JhZGlhbEdyYWRpZW50PjwvZGVmcz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjEwMDAiIGZpbGw9InVybCgjYmcpIi8+CiAgPGcgZmlsdGVyPSJ1cmwoI2JsdXJGKSI+PGVsbGlwc2UgY3g9IjQ5MC4xIiBjeT0iODIuNSIgcng9IjIyLjciIHJ5PSI4LjciIGZpbGw9IiM0QTU2MzgiIG9wYWNpdHk9IjAuNDkiIHRyYW5zZm9ybT0icm90YXRlKDI2MiA0OTAuMSA4Mi41KSIvPjxlbGxpcHNlIGN4PSIzNTUuMSIgY3k9IjIxMC4xIiByeD0iMTUuOCIgcnk9IjE0LjYiIGZpbGw9IiM0QTU2MzgiIG9wYWNpdHk9IjAuMzkiIHRyYW5zZm9ybT0icm90YXRlKDMzMiAzNTUuMSAyMTAuMSkiLz48ZWxsaXBzZSBjeD0iNzE3LjUiIGN5PSIyODMuMCIgcng9IjIyLjQiIHJ5PSIxMC4zIiBmaWxsPSIjNEE1NjM4IiBvcGFjaXR5PSIwLjQ1IiB0cmFuc2Zvcm09InJvdGF0ZSgyNzAgNzE3LjUgMjgzLjApIi8+PGVsbGlwc2UgY3g9IjM5Ny44IiBjeT0iMjgwLjQiIHJ4PSIxNS41IiByeT0iMTEuOSIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC42MSIgdHJhbnNmb3JtPSJyb3RhdGUoMjE1IDM5Ny44IDI4MC40KSIvPjxlbGxpcHNlIGN4PSI0MjYuMSIgY3k9IjQ0LjgiIHJ4PSIxNi4yIiByeT0iMTAuMiIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC42MiIgdHJhbnNmb3JtPSJyb3RhdGUoMzA0IDQyNi4xIDQ0LjgpIi8+PGVsbGlwc2UgY3g9IjIyNS40IiBjeT0iMjc4LjkiIHJ4PSIxNC41IiByeT0iMTIuOCIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC42NCIgdHJhbnNmb3JtPSJyb3RhdGUoMTI0IDIyNS40IDI3OC45KSIvPjxlbGxpcHNlIGN4PSI2ODQuNCIgY3k9IjIwMy44IiByeD0iMTQuOCIgcnk9IjEwLjciIGZpbGw9IiM0QTU2MzgiIG9wYWNpdHk9IjAuNDgiIHRyYW5zZm9ybT0icm90YXRlKDg5IDY4NC40IDIwMy44KSIvPjxlbGxpcHNlIGN4PSI1NTUuMSIgY3k9IjcwLjEiIHJ4PSIyNi42IiByeT0iMTAuNCIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC4zNyIgdHJhbnNmb3JtPSJyb3RhdGUoMjAxIDU1NS4xIDcwLjEpIi8+PGVsbGlwc2UgY3g9IjE0MS4yIiBjeT0iMTc0LjQiIHJ4PSIyNi42IiByeT0iMTIuOCIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC40OSIgdHJhbnNmb3JtPSJyb3RhdGUoMTIgMTQxLjIgMTc0LjQpIi8+PGVsbGlwc2UgY3g9IjQwOC42IiBjeT0iNDcuMiIgcng9IjI0LjMiIHJ5PSI5LjEiIGZpbGw9IiM0QTU2MzgiIG9wYWNpdHk9IjAuNTIiIHRyYW5zZm9ybT0icm90YXRlKDEyNyA0MDguNiA0Ny4yKSIvPjxlbGxpcHNlIGN4PSIzMTkuOCIgY3k9IjIwNS43IiByeD0iMTYuNiIgcnk9IjkuNCIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC42MyIgdHJhbnNmb3JtPSJyb3RhdGUoMTE5IDMxOS44IDIwNS43KSIvPjxlbGxpcHNlIGN4PSI2MTkuMSIgY3k9IjI2NC42IiByeD0iMjEuNyIgcnk9IjkuMiIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC4zOCIgdHJhbnNmb3JtPSJyb3RhdGUoMzE2IDYxOS4xIDI2NC42KSIvPjxlbGxpcHNlIGN4PSIxNTQuOSIgY3k9IjE1OC45IiByeD0iMjIuNiIgcnk9IjguOSIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC40OSIgdHJhbnNmb3JtPSJyb3RhdGUoNTkgMTU0LjkgMTU4LjkpIi8+PGVsbGlwc2UgY3g9IjQyMi43IiBjeT0iMTYxLjkiIHJ4PSIxOS45IiByeT0iOS42IiBmaWxsPSIjNEE1NjM4IiBvcGFjaXR5PSIwLjQ3IiB0cmFuc2Zvcm09InJvdGF0ZSg3MyA0MjIuNyAxNjEuOSkiLz48ZWxsaXBzZSBjeD0iMTYxLjQiIGN5PSI4Ny4yIiByeD0iMjcuOSIgcnk9IjEyLjAiIGZpbGw9IiM0QTU2MzgiIG9wYWNpdHk9IjAuNjIiIHRyYW5zZm9ybT0icm90YXRlKDUgMTYxLjQgODcuMikiLz48ZWxsaXBzZSBjeD0iNjgzLjciIGN5PSIxNTYuOCIgcng9IjI2LjciIHJ5PSIxMi42IiBmaWxsPSIjNEE1NjM4IiBvcGFjaXR5PSIwLjU2IiB0cmFuc2Zvcm09InJvdGF0ZSg4MyA2ODMuNyAxNTYuOCkiLz48ZWxsaXBzZSBjeD0iNTYwLjAiIGN5PSI2My4wIiByeD0iMTguMiIgcnk9IjguMiIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC40NyIgdHJhbnNmb3JtPSJyb3RhdGUoMTg3IDU2MC4wIDYzLjApIi8+PGVsbGlwc2UgY3g9IjI2Ni45IiBjeT0iMjY5LjMiIHJ4PSIxNS4zIiByeT0iMTIuNiIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC40MiIgdHJhbnNmb3JtPSJyb3RhdGUoMjE0IDI2Ni45IDI2OS4zKSIvPjxlbGxpcHNlIGN4PSI1ODEuOCIgY3k9IjIxOS4wIiByeD0iMTUuMCIgcnk9IjEwLjAiIGZpbGw9IiM0QTU2MzgiIG9wYWNpdHk9IjAuNTMiIHRyYW5zZm9ybT0icm90YXRlKDM1NCA1ODEuOCAyMTkuMCkiLz48ZWxsaXBzZSBjeD0iMTA2LjQiIGN5PSIxOTMuMSIgcng9IjI1LjEiIHJ5PSIxNC41IiBmaWxsPSIjNEE1NjM4IiBvcGFjaXR5PSIwLjQ1IiB0cmFuc2Zvcm09InJvdGF0ZSgyOTIgMTA2LjQgMTkzLjEpIi8+PGVsbGlwc2UgY3g9IjM3NS41IiBjeT0iMjc3LjgiIHJ4PSIxNC4yIiByeT0iMTUuNSIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC40NyIgdHJhbnNmb3JtPSJyb3RhdGUoMTQ3IDM3NS41IDI3Ny44KSIvPjxlbGxpcHNlIGN4PSIxMzYuNCIgY3k9Ijg4LjYiIHJ4PSIyNS43IiByeT0iMTMuNCIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC40MCIgdHJhbnNmb3JtPSJyb3RhdGUoMTI0IDEzNi40IDg4LjYpIi8+PGVsbGlwc2UgY3g9IjE2OS44IiBjeT0iNzUuNSIgcng9IjE3LjUiIHJ5PSIxMC42IiBmaWxsPSIjNEE1NjM4IiBvcGFjaXR5PSIwLjY0IiB0cmFuc2Zvcm09InJvdGF0ZSgzNTkgMTY5LjggNzUuNSkiLz48ZWxsaXBzZSBjeD0iNTg2LjYiIGN5PSIxNTQuMyIgcng9IjIyLjAiIHJ5PSIxNC4yIiBmaWxsPSIjNEE1NjM4IiBvcGFjaXR5PSIwLjYyIiB0cmFuc2Zvcm09InJvdGF0ZSgyNzEgNTg2LjYgMTU0LjMpIi8+PGVsbGlwc2UgY3g9IjQ4Ny4zIiBjeT0iNzUuNyIgcng9IjI0LjAiIHJ5PSIxNC44IiBmaWxsPSIjNEE1NjM4IiBvcGFjaXR5PSIwLjU5IiB0cmFuc2Zvcm09InJvdGF0ZSgzMyA0ODcuMyA3NS43KSIvPjxlbGxpcHNlIGN4PSI1MzkuMiIgY3k9IjExNy44IiByeD0iMTYuNiIgcnk9IjE1LjciIGZpbGw9IiM0QTU2MzgiIG9wYWNpdHk9IjAuNTUiIHRyYW5zZm9ybT0icm90YXRlKDI2OCA1MzkuMiAxMTcuOCkiLz48ZWxsaXBzZSBjeD0iMTY2LjQiIGN5PSIyNTIuMCIgcng9IjI5LjAiIHJ5PSIxNS4yIiBmaWxsPSIjNEE1NjM4IiBvcGFjaXR5PSIwLjU3IiB0cmFuc2Zvcm09InJvdGF0ZSgzMDAgMTY2LjQgMjUyLjApIi8+PGVsbGlwc2UgY3g9IjU5My40IiBjeT0iMTg1LjMiIHJ4PSIyMS4wIiByeT0iMTQuNiIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC41OSIgdHJhbnNmb3JtPSJyb3RhdGUoMzEzIDU5My40IDE4NS4zKSIvPjxlbGxpcHNlIGN4PSIyNzEuMyIgY3k9IjI4OS4xIiByeD0iMjIuNSIgcnk9IjE1LjYiIGZpbGw9IiM0QTU2MzgiIG9wYWNpdHk9IjAuMzgiIHRyYW5zZm9ybT0icm90YXRlKDM0OSAyNzEuMyAyODkuMSkiLz48ZWxsaXBzZSBjeD0iNTg0LjAiIGN5PSI5MC42IiByeD0iMjcuNCIgcnk9IjkuOSIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC40MSIgdHJhbnNmb3JtPSJyb3RhdGUoMTY1IDU4NC4wIDkwLjYpIi8+PGVsbGlwc2UgY3g9IjIzMS41IiBjeT0iMTU3LjkiIHJ4PSIyOC41IiByeT0iMTMuNSIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC41NiIgdHJhbnNmb3JtPSJyb3RhdGUoMTQxIDIzMS41IDE1Ny45KSIvPjxlbGxpcHNlIGN4PSI1ODEuNyIgY3k9IjI0Mi4yIiByeD0iMjQuOSIgcnk9IjE1LjUiIGZpbGw9IiM0QTU2MzgiIG9wYWNpdHk9IjAuNjAiIHRyYW5zZm9ybT0icm90YXRlKDE0NiA1ODEuNyAyNDIuMikiLz48ZWxsaXBzZSBjeD0iMTM1LjciIGN5PSIyMDIuNyIgcng9IjI3LjQiIHJ5PSIxMC43IiBmaWxsPSIjNEE1NjM4IiBvcGFjaXR5PSIwLjUzIiB0cmFuc2Zvcm09InJvdGF0ZSgzMDEgMTM1LjcgMjAyLjcpIi8+PGVsbGlwc2UgY3g9IjU4Ny41IiBjeT0iMjEuMyIgcng9IjIxLjgiIHJ5PSI4LjEiIGZpbGw9IiM0QTU2MzgiIG9wYWNpdHk9IjAuMzgiIHRyYW5zZm9ybT0icm90YXRlKDI5MiA1ODcuNSAyMS4zKSIvPjxlbGxpcHNlIGN4PSIzNDcuOSIgY3k9IjE4OS4zIiByeD0iMjEuMyIgcnk9IjEwLjciIGZpbGw9IiM0QTU2MzgiIG9wYWNpdHk9IjAuNDEiIHRyYW5zZm9ybT0icm90YXRlKDEyNyAzNDcuOSAxODkuMykiLz48ZWxsaXBzZSBjeD0iNjIwLjUiIGN5PSIxOTMuNCIgcng9IjE4LjciIHJ5PSI4LjciIGZpbGw9IiM0QTU2MzgiIG9wYWNpdHk9IjAuNDMiIHRyYW5zZm9ybT0icm90YXRlKDI1MiA2MjAuNSAxOTMuNCkiLz48cmVjdCB4PSI5Ni4wIiB5PSIzMDAuMCIgd2lkdGg9IjYwOC4wIiBoZWlnaHQ9IjQ0LjAiIGZpbGw9IiM1QzQ1MjciIG9wYWNpdHk9IjAuNzUiLz48cmVjdCB4PSI5Ni4wIiB5PSIzNTAuMCIgd2lkdGg9IjYwOC4wIiBoZWlnaHQ9IjQ0LjAiIGZpbGw9IiM0QTM2MjAiIG9wYWNpdHk9IjAuNzUiLz48cmVjdCB4PSI5Ni4wIiB5PSI0MDAuMCIgd2lkdGg9IjYwOC4wIiBoZWlnaHQ9IjQ0LjAiIGZpbGw9IiM1QzQ1MjciIG9wYWNpdHk9IjAuNzUiLz48cmVjdCB4PSI5Ni4wIiB5PSI0NTAuMCIgd2lkdGg9IjYwOC4wIiBoZWlnaHQ9IjQ0LjAiIGZpbGw9IiM0QTM2MjAiIG9wYWNpdHk9IjAuNzUiLz48cmVjdCB4PSI5Ni4wIiB5PSI1MDAuMCIgd2lkdGg9IjYwOC4wIiBoZWlnaHQ9IjQ0LjAiIGZpbGw9IiM1QzQ1MjciIG9wYWNpdHk9IjAuNzUiLz48cmVjdCB4PSI5Ni4wIiB5PSI1NTAuMCIgd2lkdGg9IjYwOC4wIiBoZWlnaHQ9IjQ0LjAiIGZpbGw9IiM0QTM2MjAiIG9wYWNpdHk9IjAuNzUiLz48cmVjdCB4PSI5Ni4wIiB5PSI2MDAuMCIgd2lkdGg9IjYwOC4wIiBoZWlnaHQ9IjQ0LjAiIGZpbGw9IiM1QzQ1MjciIG9wYWNpdHk9IjAuNzUiLz48cmVjdCB4PSI5Ni4wIiB5PSI2NTAuMCIgd2lkdGg9IjYwOC4wIiBoZWlnaHQ9IjQ0LjAiIGZpbGw9IiM0QTM2MjAiIG9wYWNpdHk9IjAuNzUiLz48cmVjdCB4PSI5Ni4wIiB5PSI3MDAuMCIgd2lkdGg9IjYwOC4wIiBoZWlnaHQ9IjQ0LjAiIGZpbGw9IiM1QzQ1MjciIG9wYWNpdHk9IjAuNzUiLz48cmVjdCB4PSI5Ni4wIiB5PSI3NTAuMCIgd2lkdGg9IjYwOC4wIiBoZWlnaHQ9IjQ0LjAiIGZpbGw9IiM0QTM2MjAiIG9wYWNpdHk9IjAuNzUiLz48L2c+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSIxMDAwIiBmaWxsPSJ1cmwoI3ZpZykiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjEwMDAiIGZpbHRlcj0idXJsKCNncmFpbkYpIi8+Cjwvc3ZnPg==" alt="Odvoz posekané trávy a zahradního odpadu"></div>
+      <div class="service-copy">
+        <span class="eyebrow on-cream">04 — Odvoz odpadu</span>
+        <h3>Odvoz a likvidace zahradního odpadu</h3>
+        <p>Posekaná tráva, větve a odpad ze zahrady zmizí ve stejný den jako práce — beze zbytku a bez vlastního odvozu.</p>
+        <ul class="service-list">
+          <li><span>Co odvezeme</span><span>Trávu, listí, větve, ořezy</span></li>
+          <li><span>Kdy</span><span>Rovnou po dokončení práce</span></li>
+          <li><span>Likvidace</span><span>V souladu s předpisy</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAKTA / PŘÍSLIB ============ -->
+<section class="facts on-cream">
+  <div class="wrap">
+    <div class="facts-grid reveal">
+      <div class="fact">
+        <span class="fact-num" data-count="4">0</span>
+        <span class="fact-label">služby v jedné objednávce — sekání, mulčování, závlaha, odvoz</span>
+      </div>
+      <div class="fact">
+        <span class="fact-num" data-count="1">0</span>
+        <span class="fact-label">tým, který zahradu zná od první návštěvy do poslední fáze péče</span>
+      </div>
+      <div class="fact">
+        <span class="fact-num" data-count="0" data-suffix="km">0</span>
+        <span class="fact-label">bez zbytečných kilometrů navíc — Brno a nejbližší okolí</span>
+      </div>
+      <div class="fact">
+        <span class="fact-num" data-count="48" data-suffix="h">0</span>
+        <span class="fact-label">obvyklá doba, do které se ozveme na vaši poptávku</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ JAK TO FUNGUJE ============ -->
+<section class="process" id="proces">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Průběh</span>
+      <h2>Jak spolupráce probíhá.</h2>
+      <p>Čtyři kroky, žádné papírování navíc.</p>
+    </div>
+
+    <div class="process-step reveal">
+      <div class="process-num">01</div>
+      <div class="process-copy">
+        <h3>Poptávka</h3>
+        <p>Napíšete nám velikost a stav zahrady a co potřebujete řešit — sekání, mulč, závlahu nebo odvoz.</p>
+      </div>
+      <div class="process-media"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgOTYwIDYwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBzbGljZSI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxQzIxMTUiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMkEzMzIwIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PjxmaWx0ZXIgaWQ9ImJsdXJGIiB4PSItNDAlIiB5PSItNDAlIiB3aWR0aD0iMTgwJSIgaGVpZ2h0PSIxODAlIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxMCIvPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9ImdyYWluRiIgeD0iLTIwJSIgeT0iLTIwJSIgd2lkdGg9IjE0MCUiIGhlaWdodD0iMTQwJSI+CiAgICAgIDxmZVR1cmJ1bGVuY2UgdHlwZT0iZnJhY3RhbE5vaXNlIiBiYXNlRnJlcXVlbmN5PSIxLjAiIG51bU9jdGF2ZXM9IjIiIHNlZWQ9IjM0MCIgcmVzdWx0PSJuIi8+CiAgICAgIDxmZUNvbG9yTWF0cml4IGluPSJuIiB0eXBlPSJtYXRyaXgiIHZhbHVlcz0iMCAwIDAgMCAwICAwIDAgMCAwIDAgIDAgMCAwIDAgMCAgMCAwIDAgMC4wNSAwIi8+CiAgICA8L2ZpbHRlcj48cmFkaWFsR3JhZGllbnQgaWQ9InZpZyIgY3g9IjUwJSIgY3k9IjQ2JSIgcj0iNzAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSI1NSUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+CiAgICA8L3JhZGlhbEdyYWRpZW50PjwvZGVmcz4KICA8cmVjdCB3aWR0aD0iOTYwIiBoZWlnaHQ9IjYwMCIgZmlsbD0idXJsKCNiZykiLz4KICA8ZyBmaWx0ZXI9InVybCgjYmx1ckYpIj48Y2lyY2xlIGN4PSI0MTMuNCIgY3k9IjMxMy43IiByPSI1OS4zIiBmaWxsPSIjRDJBQzYzIiBvcGFjaXR5PSIwLjEwIi8+PGNpcmNsZSBjeD0iNTcxLjUiIGN5PSIyNTUuMiIgcj0iMTExLjciIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMTIiLz48Y2lyY2xlIGN4PSIzNTkuNSIgY3k9IjE3NC4zIiByPSI1My40IiBmaWxsPSIjRDJBQzYzIiBvcGFjaXR5PSIwLjEyIi8+PGNpcmNsZSBjeD0iNzA3LjQiIGN5PSI0MzcuNSIgcj0iMTE2LjgiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMTEiLz48Y2lyY2xlIGN4PSIzNDkuMyIgY3k9IjQzNS40IiByPSIxMDMuMyIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4xNCIvPjxjaXJjbGUgY3g9IjczNi45IiBjeT0iNDY4LjYiIHI9IjcxLjMiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMDgiLz48Y2lyY2xlIGN4PSI3MzQuNSIgY3k9IjE1Ny4zIiByPSI1OS43IiBmaWxsPSIjRDJBQzYzIiBvcGFjaXR5PSIwLjE0Ii8+PGNpcmNsZSBjeD0iNTkzLjEiIGN5PSIzODUuMiIgcj0iOTQuMSIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4xOCIvPjxjaXJjbGUgY3g9IjY0OC45IiBjeT0iMzkxLjEiIHI9IjkzLjMiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMDkiLz48Y2lyY2xlIGN4PSI2NjIuNCIgY3k9IjIxMS4yIiByPSI3My4zIiBmaWxsPSIjRDJBQzYzIiBvcGFjaXR5PSIwLjEzIi8+PGVsbGlwc2UgY3g9IjQ4MCIgY3k9IjMwMCIgcng9IjIwMCIgcnk9IjEzMCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4xIi8+PC9nPgogIDxyZWN0IHdpZHRoPSI5NjAiIGhlaWdodD0iNjAwIiBmaWxsPSJ1cmwoI3ZpZykiLz4KICA8cmVjdCB3aWR0aD0iOTYwIiBoZWlnaHQ9IjYwMCIgZmlsdGVyPSJ1cmwoI2dyYWluRikiLz4KPC9zdmc+" alt="Skica plánu zahrady"></div>
+    </div>
+
+    <div class="process-step reveal">
+      <div class="process-num">02</div>
+      <div class="process-copy">
+        <h3>Prohlídka a nabídka</h3>
+        <p>Podíváme se na pozemek a navrhneme rozsah prací a termín, který vám sedí.</p>
+      </div>
+      <div class="process-media"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgOTYwIDYwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBzbGljZSI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxNzFCMTIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMjQyQzFCIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PjxmaWx0ZXIgaWQ9ImJsdXJGIiB4PSItNDAlIiB5PSItNDAlIiB3aWR0aD0iMTgwJSIgaGVpZ2h0PSIxODAlIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxMCIvPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9ImdyYWluRiIgeD0iLTIwJSIgeT0iLTIwJSIgd2lkdGg9IjE0MCUiIGhlaWdodD0iMTQwJSI+CiAgICAgIDxmZVR1cmJ1bGVuY2UgdHlwZT0iZnJhY3RhbE5vaXNlIiBiYXNlRnJlcXVlbmN5PSIxLjAiIG51bU9jdGF2ZXM9IjIiIHNlZWQ9IjQ1NSIgcmVzdWx0PSJuIi8+CiAgICAgIDxmZUNvbG9yTWF0cml4IGluPSJuIiB0eXBlPSJtYXRyaXgiIHZhbHVlcz0iMCAwIDAgMCAwICAwIDAgMCAwIDAgIDAgMCAwIDAgMCAgMCAwIDAgMC4wNSAwIi8+CiAgICA8L2ZpbHRlcj48cmFkaWFsR3JhZGllbnQgaWQ9InZpZyIgY3g9IjUwJSIgY3k9IjQ2JSIgcj0iNzAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSI1NSUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+CiAgICA8L3JhZGlhbEdyYWRpZW50PjwvZGVmcz4KICA8cmVjdCB3aWR0aD0iOTYwIiBoZWlnaHQ9IjYwMCIgZmlsbD0idXJsKCNiZykiLz4KICA8ZyBmaWx0ZXI9InVybCgjYmx1ckYpIj48ZWxsaXBzZSBjeD0iMzAwIiBjeT0iMzAwIiByeD0iMTgwIiByeT0iMTUwIiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjE2Ii8+PGVsbGlwc2UgY3g9IjY0MCIgY3k9IjM2MCIgcng9IjE1MCIgcnk9IjExMCIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC4xMiIvPjwvZz4KICA8cmVjdCB3aWR0aD0iOTYwIiBoZWlnaHQ9IjYwMCIgZmlsbD0idXJsKCN2aWcpIi8+CiAgPHJlY3Qgd2lkdGg9Ijk2MCIgaGVpZ2h0PSI2MDAiIGZpbHRlcj0idXJsKCNncmFpbkYpIi8+Cjwvc3ZnPg==" alt="Prohlídka zahrady"></div>
+    </div>
+
+    <div class="process-step reveal">
+      <div class="process-num">03</div>
+      <div class="process-copy">
+        <h3>Realizace</h3>
+        <p>Sekání, mulčování nebo instalace závlahy proběhne v domluveném termínu — s vlastním nářadím a technikou.</p>
+      </div>
+      <div class="process-media"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgOTYwIDYwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBzbGljZSI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxQjIwMTMiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMzMzQjIyIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PjxmaWx0ZXIgaWQ9ImJsdXJGIiB4PSItNDAlIiB5PSItNDAlIiB3aWR0aD0iMTgwJSIgaGVpZ2h0PSIxODAlIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxMCIvPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9ImdyYWluRiIgeD0iLTIwJSIgeT0iLTIwJSIgd2lkdGg9IjE0MCUiIGhlaWdodD0iMTQwJSI+CiAgICAgIDxmZVR1cmJ1bGVuY2UgdHlwZT0iZnJhY3RhbE5vaXNlIiBiYXNlRnJlcXVlbmN5PSIxLjAiIG51bU9jdGF2ZXM9IjIiIHNlZWQ9IjI3MyIgcmVzdWx0PSJuIi8+CiAgICAgIDxmZUNvbG9yTWF0cml4IGluPSJuIiB0eXBlPSJtYXRyaXgiIHZhbHVlcz0iMCAwIDAgMCAwICAwIDAgMCAwIDAgIDAgMCAwIDAgMCAgMCAwIDAgMC4wNSAwIi8+CiAgICA8L2ZpbHRlcj48cmFkaWFsR3JhZGllbnQgaWQ9InZpZyIgY3g9IjUwJSIgY3k9IjQ2JSIgcj0iNzAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSI1NSUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+CiAgICA8L3JhZGlhbEdyYWRpZW50PjwvZGVmcz4KICA8cmVjdCB3aWR0aD0iOTYwIiBoZWlnaHQ9IjYwMCIgZmlsbD0idXJsKCNiZykiLz4KICA8ZyBmaWx0ZXI9InVybCgjYmx1ckYpIj48cmVjdCB4PSItNjAiIHk9Ii02MCIgd2lkdGg9IjEwODAiIGhlaWdodD0iNTYiIGZpbGw9IiNGM0VFRTEiIG9wYWNpdHk9IjAuMSIgdHJhbnNmb3JtPSJyb3RhdGUoLTYgNDgwIDMwMCkiLz48cmVjdCB4PSItNjAiIHk9Ii00IiB3aWR0aD0iMTA4MCIgaGVpZ2h0PSI1NiIgZmlsbD0iI0YzRUVFMSIgb3BhY2l0eT0iMC4xOCIgdHJhbnNmb3JtPSJyb3RhdGUoLTYgNDgwIDMwMCkiLz48cmVjdCB4PSItNjAiIHk9IjUyIiB3aWR0aD0iMTA4MCIgaGVpZ2h0PSI1NiIgZmlsbD0iI0YzRUVFMSIgb3BhY2l0eT0iMC4xIiB0cmFuc2Zvcm09InJvdGF0ZSgtNiA0ODAgMzAwKSIvPjxyZWN0IHg9Ii02MCIgeT0iMTA4IiB3aWR0aD0iMTA4MCIgaGVpZ2h0PSI1NiIgZmlsbD0iI0YzRUVFMSIgb3BhY2l0eT0iMC4xOCIgdHJhbnNmb3JtPSJyb3RhdGUoLTYgNDgwIDMwMCkiLz48cmVjdCB4PSItNjAiIHk9IjE2NCIgd2lkdGg9IjEwODAiIGhlaWdodD0iNTYiIGZpbGw9IiNGM0VFRTEiIG9wYWNpdHk9IjAuMSIgdHJhbnNmb3JtPSJyb3RhdGUoLTYgNDgwIDMwMCkiLz48cmVjdCB4PSItNjAiIHk9IjIyMCIgd2lkdGg9IjEwODAiIGhlaWdodD0iNTYiIGZpbGw9IiNGM0VFRTEiIG9wYWNpdHk9IjAuMTgiIHRyYW5zZm9ybT0icm90YXRlKC02IDQ4MCAzMDApIi8+PHJlY3QgeD0iLTYwIiB5PSIyNzYiIHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjU2IiBmaWxsPSIjRjNFRUUxIiBvcGFjaXR5PSIwLjEiIHRyYW5zZm9ybT0icm90YXRlKC02IDQ4MCAzMDApIi8+PHJlY3QgeD0iLTYwIiB5PSIzMzIiIHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjU2IiBmaWxsPSIjRjNFRUUxIiBvcGFjaXR5PSIwLjE4IiB0cmFuc2Zvcm09InJvdGF0ZSgtNiA0ODAgMzAwKSIvPjxyZWN0IHg9Ii02MCIgeT0iMzg4IiB3aWR0aD0iMTA4MCIgaGVpZ2h0PSI1NiIgZmlsbD0iI0YzRUVFMSIgb3BhY2l0eT0iMC4xIiB0cmFuc2Zvcm09InJvdGF0ZSgtNiA0ODAgMzAwKSIvPjxyZWN0IHg9Ii02MCIgeT0iNDQ0IiB3aWR0aD0iMTA4MCIgaGVpZ2h0PSI1NiIgZmlsbD0iI0YzRUVFMSIgb3BhY2l0eT0iMC4xOCIgdHJhbnNmb3JtPSJyb3RhdGUoLTYgNDgwIDMwMCkiLz48cmVjdCB4PSItNjAiIHk9IjUwMCIgd2lkdGg9IjEwODAiIGhlaWdodD0iNTYiIGZpbGw9IiNGM0VFRTEiIG9wYWNpdHk9IjAuMSIgdHJhbnNmb3JtPSJyb3RhdGUoLTYgNDgwIDMwMCkiLz48cmVjdCB4PSItNjAiIHk9IjU1NiIgd2lkdGg9IjEwODAiIGhlaWdodD0iNTYiIGZpbGw9IiNGM0VFRTEiIG9wYWNpdHk9IjAuMTgiIHRyYW5zZm9ybT0icm90YXRlKC02IDQ4MCAzMDApIi8+PHJlY3QgeD0iLTYwIiB5PSI2MTIiIHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjU2IiBmaWxsPSIjRjNFRUUxIiBvcGFjaXR5PSIwLjEiIHRyYW5zZm9ybT0icm90YXRlKC02IDQ4MCAzMDApIi8+PC9nPgogIDxyZWN0IHdpZHRoPSI5NjAiIGhlaWdodD0iNjAwIiBmaWxsPSJ1cmwoI3ZpZykiLz4KICA8cmVjdCB3aWR0aD0iOTYwIiBoZWlnaHQ9IjYwMCIgZmlsdGVyPSJ1cmwoI2dyYWluRikiLz4KPC9zdmc+" alt="Sekání trávníku"></div>
+    </div>
+
+    <div class="process-step reveal">
+      <div class="process-num">04</div>
+      <div class="process-copy">
+        <h3>Úklid a odvoz</h3>
+        <p>Posekanou trávu a zahradní odpad odvezeme rovnou — zahrada zůstane hotová, ne s hromadou práce navíc.</p>
+      </div>
+      <div class="process-media"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgOTYwIDYwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBzbGljZSI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxOTE0MTAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMjQxQzE1Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PjxmaWx0ZXIgaWQ9ImJsdXJGIiB4PSItNDAlIiB5PSItNDAlIiB3aWR0aD0iMTgwJSIgaGVpZ2h0PSIxODAlIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxMCIvPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9ImdyYWluRiIgeD0iLTIwJSIgeT0iLTIwJSIgd2lkdGg9IjE0MCUiIGhlaWdodD0iMTQwJSI+CiAgICAgIDxmZVR1cmJ1bGVuY2UgdHlwZT0iZnJhY3RhbE5vaXNlIiBiYXNlRnJlcXVlbmN5PSIxLjAiIG51bU9jdGF2ZXM9IjIiIHNlZWQ9IjcyMSIgcmVzdWx0PSJuIi8+CiAgICAgIDxmZUNvbG9yTWF0cml4IGluPSJuIiB0eXBlPSJtYXRyaXgiIHZhbHVlcz0iMCAwIDAgMCAwICAwIDAgMCAwIDAgIDAgMCAwIDAgMCAgMCAwIDAgMC4wNSAwIi8+CiAgICA8L2ZpbHRlcj48cmFkaWFsR3JhZGllbnQgaWQ9InZpZyIgY3g9IjUwJSIgY3k9IjQ2JSIgcj0iNzAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSI1NSUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+CiAgICA8L3JhZGlhbEdyYWRpZW50PjwvZGVmcz4KICA8cmVjdCB3aWR0aD0iOTYwIiBoZWlnaHQ9IjYwMCIgZmlsbD0idXJsKCNiZykiLz4KICA8ZyBmaWx0ZXI9InVybCgjYmx1ckYpIj48ZWxsaXBzZSBjeD0iOTE5LjUiIGN5PSIyMTcuMSIgcng9IjIwLjYiIHJ5PSIxNC4zIiBmaWxsPSIjRDJBQzYzIiBvcGFjaXR5PSIwLjIzIi8+PGVsbGlwc2UgY3g9IjUwMS4zIiBjeT0iNDA1LjkiIHJ4PSIyNC41IiByeT0iMTMuMCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yMiIvPjxlbGxpcHNlIGN4PSI5MzcuMiIgY3k9IjM0LjIiIHJ4PSIyMy40IiByeT0iMTQuOCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yNiIvPjxlbGxpcHNlIGN4PSI0MjkuOCIgY3k9IjQ1MC42IiByeD0iMjQuMyIgcnk9IjE1LjMiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMzAiLz48ZWxsaXBzZSBjeD0iMzMuNyIgY3k9IjE5NS4xIiByeD0iMTIuMiIgcnk9IjE3LjUiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMzMiLz48ZWxsaXBzZSBjeD0iMTM4LjciIGN5PSIzNTIuNSIgcng9IjE5LjIiIHJ5PSI4LjUiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMjMiLz48ZWxsaXBzZSBjeD0iNzE3LjUiIGN5PSIzODQuOSIgcng9IjE0LjUiIHJ5PSIxNS42IiBmaWxsPSIjRDJBQzYzIiBvcGFjaXR5PSIwLjIxIi8+PGVsbGlwc2UgY3g9IjUyMi41IiBjeT0iMjUyLjQiIHJ4PSIyNS43IiByeT0iMTQuNSIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4zMSIvPjxlbGxpcHNlIGN4PSI2NDkuNCIgY3k9IjIyOC4zIiByeD0iMjUuNCIgcnk9IjE1LjEiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMjkiLz48ZWxsaXBzZSBjeD0iMjY2LjQiIGN5PSI5Ny4xIiByeD0iMTkuMiIgcnk9IjE2LjMiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMzEiLz48ZWxsaXBzZSBjeD0iMzMzLjQiIGN5PSI4My45IiByeD0iMTguMyIgcnk9IjE2LjgiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMTgiLz48ZWxsaXBzZSBjeD0iNzA4LjgiIGN5PSIxMDIuNCIgcng9IjE1LjAiIHJ5PSI4LjUiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMjEiLz48ZWxsaXBzZSBjeD0iMzY3LjciIGN5PSI1ODAuMiIgcng9IjI1LjQiIHJ5PSI5LjkiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMjEiLz48ZWxsaXBzZSBjeD0iOTA2LjAiIGN5PSIxMTguNCIgcng9IjE1LjEiIHJ5PSIxMi40IiBmaWxsPSIjRDJBQzYzIiBvcGFjaXR5PSIwLjE3Ii8+PGVsbGlwc2UgY3g9IjI0OS44IiBjeT0iMjM2LjQiIHJ4PSIxNi4yIiByeT0iMTcuNiIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yMCIvPjxlbGxpcHNlIGN4PSIxOTUuOCIgY3k9IjU0NS4zIiByeD0iMTcuMiIgcnk9IjE2LjQiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMjgiLz48ZWxsaXBzZSBjeD0iNzQ3LjUiIGN5PSIxODguOSIgcng9IjEyLjQiIHJ5PSIxNS42IiBmaWxsPSIjRDJBQzYzIiBvcGFjaXR5PSIwLjI0Ii8+PGVsbGlwc2UgY3g9IjUzNi40IiBjeT0iNDAyLjQiIHJ4PSIyMi4wIiByeT0iMTAuOCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yMiIvPjxlbGxpcHNlIGN4PSI4ODAuOCIgY3k9IjMxNy42IiByeD0iMTQuNiIgcnk9IjE0LjMiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMjAiLz48ZWxsaXBzZSBjeD0iNzQwLjUiIGN5PSIyNC44IiByeD0iMjMuMiIgcnk9IjEzLjciIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMjIiLz48ZWxsaXBzZSBjeD0iOTAyLjMiIGN5PSIxNTkuMyIgcng9IjEzLjkiIHJ5PSI4LjciIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMjYiLz48ZWxsaXBzZSBjeD0iNzIzLjYiIGN5PSI0MDYuOCIgcng9IjE2LjYiIHJ5PSIxNi4xIiBmaWxsPSIjRDJBQzYzIiBvcGFjaXR5PSIwLjE3Ii8+PGVsbGlwc2UgY3g9IjI5NC43IiBjeT0iMzg2LjkiIHJ4PSIyNS41IiByeT0iMTQuMyIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yOSIvPjxlbGxpcHNlIGN4PSI3NDMuNiIgY3k9IjIzNi43IiByeD0iMjUuMCIgcnk9IjE1LjQiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMjIiLz48ZWxsaXBzZSBjeD0iMzc2LjkiIGN5PSI0ODMuNCIgcng9IjE1LjYiIHJ5PSI5LjkiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMzIiLz48ZWxsaXBzZSBjeD0iNTEwLjUiIGN5PSIzMTIuNyIgcng9IjIwLjciIHJ5PSIxNy4wIiBmaWxsPSIjRDJBQzYzIiBvcGFjaXR5PSIwLjE4Ii8+PGVsbGlwc2UgY3g9IjMyNS4yIiBjeT0iMzkuNiIgcng9IjE2LjYiIHJ5PSIxMy4wIiBmaWxsPSIjRDJBQzYzIiBvcGFjaXR5PSIwLjMyIi8+PGVsbGlwc2UgY3g9IjY0MS4xIiBjeT0iMzQ2LjciIHJ4PSIxNi41IiByeT0iMTMuNyIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yMCIvPjxlbGxpcHNlIGN4PSI4MTEuMCIgY3k9IjQ3My4xIiByeD0iMjMuNCIgcnk9IjkuNSIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yOCIvPjxlbGxpcHNlIGN4PSI3MjQuMCIgY3k9IjMwMC4zIiByeD0iMjQuNCIgcnk9IjE3LjAiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMzAiLz48ZWxsaXBzZSBjeD0iNzg4LjEiIGN5PSIzODkuMyIgcng9IjI0LjEiIHJ5PSI5LjMiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMjkiLz48ZWxsaXBzZSBjeD0iNjc1LjYiIGN5PSIzNjcuNCIgcng9IjE0LjQiIHJ5PSI4LjciIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMjciLz48ZWxsaXBzZSBjeD0iNzkxLjMiIGN5PSIxNjMuOCIgcng9IjEzLjQiIHJ5PSIxMC4yIiBmaWxsPSIjRDJBQzYzIiBvcGFjaXR5PSIwLjE3Ii8+PGVsbGlwc2UgY3g9IjY0OS4wIiBjeT0iNTg0LjkiIHJ4PSIyMi44IiByeT0iMTEuNiIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yOSIvPjxlbGxpcHNlIGN4PSI2OS4zIiBjeT0iNTAzLjIiIHJ4PSIxNS4yIiByeT0iOC4wIiBmaWxsPSIjRDJBQzYzIiBvcGFjaXR5PSIwLjI4Ii8+PGVsbGlwc2UgY3g9IjEzMy4yIiBjeT0iMTY1LjAiIHJ4PSIxMC45IiByeT0iMTIuNSIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yNiIvPjxlbGxpcHNlIGN4PSI3NzUuMSIgY3k9IjIzLjgiIHJ4PSIyMy4yIiByeT0iOS4xIiBmaWxsPSIjRDJBQzYzIiBvcGFjaXR5PSIwLjE5Ii8+PGVsbGlwc2UgY3g9IjYwNC4zIiBjeT0iMjA0LjEiIHJ4PSIxNS4zIiByeT0iMTMuNyIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4xOSIvPjxlbGxpcHNlIGN4PSI3NjEuNyIgY3k9IjEyNS40IiByeD0iMjMuNCIgcnk9IjE2LjEiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMjYiLz48ZWxsaXBzZSBjeD0iMjkuMyIgY3k9IjQ2Ni45IiByeD0iMTAuNSIgcnk9IjEzLjAiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMjMiLz48ZWxsaXBzZSBjeD0iNjAuNSIgY3k9IjM3OC4wIiByeD0iMjEuNiIgcnk9IjEzLjgiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMjMiLz48ZWxsaXBzZSBjeD0iNDkxLjYiIGN5PSIzNTMuMyIgcng9IjEzLjYiIHJ5PSIxNi43IiBmaWxsPSIjRDJBQzYzIiBvcGFjaXR5PSIwLjM1Ii8+PGVsbGlwc2UgY3g9Ijc3Mi4wIiBjeT0iNTc2LjgiIHJ4PSIxNS4zIiByeT0iMTcuOSIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4xNiIvPjxlbGxpcHNlIGN4PSI0NTguOCIgY3k9IjgwLjIiIHJ4PSIxNy4zIiByeT0iMTQuOCIgZmlsbD0iI0QyQUM2MyIgb3BhY2l0eT0iMC4yOSIvPjxlbGxpcHNlIGN4PSI0MzYuNSIgY3k9IjIwNS4wIiByeD0iMTMuMCIgcnk9IjEyLjAiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMjEiLz48ZWxsaXBzZSBjeD0iMTg2LjQiIGN5PSI0NDEuNiIgcng9IjE4LjMiIHJ5PSIxMi40IiBmaWxsPSIjRDJBQzYzIiBvcGFjaXR5PSIwLjE5Ii8+PC9nPgogIDxyZWN0IHdpZHRoPSI5NjAiIGhlaWdodD0iNjAwIiBmaWxsPSJ1cmwoI3ZpZykiLz4KICA8cmVjdCB3aWR0aD0iOTYwIiBoZWlnaHQ9IjYwMCIgZmlsdGVyPSJ1cmwoI2dyYWluRikiLz4KPC9zdmc+" alt="Odvoz zahradního odpadu"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ARCHIV PRACÍ ============ -->
+<section class="archive">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow on-cream">Typy terénu</span>
+      <h2>Zahrady, se kterými běžně pracujeme.</h2>
+      <p>Od malých předzahrádek po svažité pozemky.</p>
+    </div>
+    <div class="archive-grid reveal">
+      <div class="archive-item"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDAwIDUyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBzbGljZSI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxNzFCMTAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMkEzMjIwIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PjxmaWx0ZXIgaWQ9ImJsdXJGIiB4PSItNDAlIiB5PSItNDAlIiB3aWR0aD0iMTgwJSIgaGVpZ2h0PSIxODAlIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSI5Ii8+PC9maWx0ZXI+PGZpbHRlciBpZD0iZ3JhaW5GIiB4PSItMjAlIiB5PSItMjAlIiB3aWR0aD0iMTQwJSIgaGVpZ2h0PSIxNDAlIj4KICAgICAgPGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjEuMCIgbnVtT2N0YXZlcz0iMiIgc2VlZD0iNzYxIiByZXN1bHQ9Im4iLz4KICAgICAgPGZlQ29sb3JNYXRyaXggaW49Im4iIHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDAgIDAgMCAwIDAgMCAgMCAwIDAgMCAwICAwIDAgMCAwLjA1NSAwIi8+CiAgICA8L2ZpbHRlcj48cmFkaWFsR3JhZGllbnQgaWQ9InZpZyIgY3g9IjUwJSIgY3k9IjQ2JSIgcj0iNzAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSI1NSUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+CiAgICA8L3JhZGlhbEdyYWRpZW50PjwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjUyMCIgZmlsbD0idXJsKCNiZykiLz4KICA8ZyBmaWx0ZXI9InVybCgjYmx1ckYpIj48cmVjdCB4PSItNDAiIHk9Ii00MCIgd2lkdGg9IjQ4MCIgaGVpZ2h0PSI1MiIgZmlsbD0iIzNFNEEyOSIgb3BhY2l0eT0iMC44NSIgdHJhbnNmb3JtPSJyb3RhdGUoLTUgMjAwLjAgMjYwLjApIi8+PHJlY3QgeD0iLTQwIiB5PSIxMi4wIiB3aWR0aD0iNDgwIiBoZWlnaHQ9IjUyIiBmaWxsPSIjNEE1QTMxIiBvcGFjaXR5PSIwLjg1IiB0cmFuc2Zvcm09InJvdGF0ZSgtNSAyMDAuMCAyNjAuMCkiLz48cmVjdCB4PSItNDAiIHk9IjY0LjAiIHdpZHRoPSI0ODAiIGhlaWdodD0iNTIiIGZpbGw9IiMzRTRBMjkiIG9wYWNpdHk9IjAuODUiIHRyYW5zZm9ybT0icm90YXRlKC01IDIwMC4wIDI2MC4wKSIvPjxyZWN0IHg9Ii00MCIgeT0iMTE2LjAiIHdpZHRoPSI0ODAiIGhlaWdodD0iNTIiIGZpbGw9IiM0QTVBMzEiIG9wYWNpdHk9IjAuODUiIHRyYW5zZm9ybT0icm90YXRlKC01IDIwMC4wIDI2MC4wKSIvPjxyZWN0IHg9Ii00MCIgeT0iMTY4LjAiIHdpZHRoPSI0ODAiIGhlaWdodD0iNTIiIGZpbGw9IiMzRTRBMjkiIG9wYWNpdHk9IjAuODUiIHRyYW5zZm9ybT0icm90YXRlKC01IDIwMC4wIDI2MC4wKSIvPjxyZWN0IHg9Ii00MCIgeT0iMjIwLjAiIHdpZHRoPSI0ODAiIGhlaWdodD0iNTIiIGZpbGw9IiM0QTVBMzEiIG9wYWNpdHk9IjAuODUiIHRyYW5zZm9ybT0icm90YXRlKC01IDIwMC4wIDI2MC4wKSIvPjxyZWN0IHg9Ii00MCIgeT0iMjcyLjAiIHdpZHRoPSI0ODAiIGhlaWdodD0iNTIiIGZpbGw9IiMzRTRBMjkiIG9wYWNpdHk9IjAuODUiIHRyYW5zZm9ybT0icm90YXRlKC01IDIwMC4wIDI2MC4wKSIvPjxyZWN0IHg9Ii00MCIgeT0iMzI0LjAiIHdpZHRoPSI0ODAiIGhlaWdodD0iNTIiIGZpbGw9IiM0QTVBMzEiIG9wYWNpdHk9IjAuODUiIHRyYW5zZm9ybT0icm90YXRlKC01IDIwMC4wIDI2MC4wKSIvPjxyZWN0IHg9Ii00MCIgeT0iMzc2LjAiIHdpZHRoPSI0ODAiIGhlaWdodD0iNTIiIGZpbGw9IiMzRTRBMjkiIG9wYWNpdHk9IjAuODUiIHRyYW5zZm9ybT0icm90YXRlKC01IDIwMC4wIDI2MC4wKSIvPjxyZWN0IHg9Ii00MCIgeT0iNDI4LjAiIHdpZHRoPSI0ODAiIGhlaWdodD0iNTIiIGZpbGw9IiM0QTVBMzEiIG9wYWNpdHk9IjAuODUiIHRyYW5zZm9ybT0icm90YXRlKC01IDIwMC4wIDI2MC4wKSIvPjxyZWN0IHg9Ii00MCIgeT0iNDgwLjAiIHdpZHRoPSI0ODAiIGhlaWdodD0iNTIiIGZpbGw9IiMzRTRBMjkiIG9wYWNpdHk9IjAuODUiIHRyYW5zZm9ybT0icm90YXRlKC01IDIwMC4wIDI2MC4wKSIvPjxyZWN0IHg9Ii00MCIgeT0iNTMyLjAiIHdpZHRoPSI0ODAiIGhlaWdodD0iNTIiIGZpbGw9IiM0QTVBMzEiIG9wYWNpdHk9IjAuODUiIHRyYW5zZm9ybT0icm90YXRlKC01IDIwMC4wIDI2MC4wKSIvPjwvZz4KICA8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjUyMCIgZmlsbD0idXJsKCN2aWcpIi8+CiAgPHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSI1MjAiIGZpbHRlcj0idXJsKCNncmFpbkYpIi8+Cjwvc3ZnPg==" alt="Okrasný trávník"><span class="archive-cap">Okrasný trávník</span></div>
+      <div class="archive-item"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDAwIDM0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBzbGljZSI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxNzFCMTAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMkEzMjIwIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PjxmaWx0ZXIgaWQ9ImJsdXJGIiB4PSItNDAlIiB5PSItNDAlIiB3aWR0aD0iMTgwJSIgaGVpZ2h0PSIxODAlIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSI5Ii8+PC9maWx0ZXI+PGZpbHRlciBpZD0iZ3JhaW5GIiB4PSItMjAlIiB5PSItMjAlIiB3aWR0aD0iMTQwJSIgaGVpZ2h0PSIxNDAlIj4KICAgICAgPGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjEuMCIgbnVtT2N0YXZlcz0iMiIgc2VlZD0iMjAyIiByZXN1bHQ9Im4iLz4KICAgICAgPGZlQ29sb3JNYXRyaXggaW49Im4iIHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDAgIDAgMCAwIDAgMCAgMCAwIDAgMCAwICAwIDAgMCAwLjA1NSAwIi8+CiAgICA8L2ZpbHRlcj48cmFkaWFsR3JhZGllbnQgaWQ9InZpZyIgY3g9IjUwJSIgY3k9IjQ2JSIgcj0iNzAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSI1NSUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+CiAgICA8L3JhZGlhbEdyYWRpZW50PjwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjM0MCIgZmlsbD0idXJsKCNiZykiLz4KICA8ZyBmaWx0ZXI9InVybCgjYmx1ckYpIj48cGF0aCBkPSJNMCAzNDAgTDAgMTcwLjAgTDQwMCA1MS4wIEw0MDAgMzQwIFoiIGZpbGw9IiMyRTM2MjQiIG9wYWNpdHk9IjAuNyIvPjxwYXRoIGQ9Ik0wIDM0MCBMMCAyMjEuMCBMNDAwIDEwMi4wIEw0MDAgMzQwIFoiIGZpbGw9IiM0QTU2MzgiIG9wYWNpdHk9IjAuNSIvPjwvZz4KICA8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjM0MCIgZmlsbD0idXJsKCN2aWcpIi8+CiAgPHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzNDAiIGZpbHRlcj0idXJsKCNncmFpbkYpIi8+Cjwvc3ZnPg==" alt="Svažitý pozemek"><span class="archive-cap">Svažitý pozemek</span></div>
+      <div class="archive-item"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDAwIDQ2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBzbGljZSI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxNzFCMTAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMkEzMjIwIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PjxmaWx0ZXIgaWQ9ImJsdXJGIiB4PSItNDAlIiB5PSItNDAlIiB3aWR0aD0iMTgwJSIgaGVpZ2h0PSIxODAlIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSI5Ii8+PC9maWx0ZXI+PGZpbHRlciBpZD0iZ3JhaW5GIiB4PSItMjAlIiB5PSItMjAlIiB3aWR0aD0iMTQwJSIgaGVpZ2h0PSIxNDAlIj4KICAgICAgPGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjEuMCIgbnVtT2N0YXZlcz0iMiIgc2VlZD0iNjg3IiByZXN1bHQ9Im4iLz4KICAgICAgPGZlQ29sb3JNYXRyaXggaW49Im4iIHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDAgIDAgMCAwIDAgMCAgMCAwIDAgMCAwICAwIDAgMCAwLjA1NSAwIi8+CiAgICA8L2ZpbHRlcj48cmFkaWFsR3JhZGllbnQgaWQ9InZpZyIgY3g9IjUwJSIgY3k9IjQ2JSIgcj0iNzAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSI1NSUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+CiAgICA8L3JhZGlhbEdyYWRpZW50PjwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQ2MCIgZmlsbD0idXJsKCNiZykiLz4KICA8ZyBmaWx0ZXI9InVybCgjYmx1ckYpIj48ZWxsaXBzZSBjeD0iMzA5LjMiIGN5PSI5Mi41IiByeD0iMjIuMSIgcnk9IjE2LjQiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuNTIiLz48ZWxsaXBzZSBjeD0iMzc5LjMiIGN5PSI0MjMuMiIgcng9IjIxLjYiIHJ5PSIxNS4yIiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjQxIi8+PGVsbGlwc2UgY3g9IjE2Ny4yIiBjeT0iMzg0LjMiIHJ4PSIyMC4zIiByeT0iMTUuNSIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC4zOCIvPjxlbGxpcHNlIGN4PSIxNDIuMiIgY3k9Ijc1LjMiIHJ4PSIyMC4xIiByeT0iMTcuOSIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC4zMyIvPjxlbGxpcHNlIGN4PSIyOTUuNyIgY3k9IjMxOC4wIiByeD0iMTYuNyIgcnk9IjguMyIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC40NCIvPjxlbGxpcHNlIGN4PSI0MC45IiBjeT0iNDkuMSIgcng9IjEyLjUiIHJ5PSIxNS44IiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjQ1Ii8+PGVsbGlwc2UgY3g9IjMzLjEiIGN5PSIxNTUuMyIgcng9IjE1LjEiIHJ5PSIxNy4wIiBmaWxsPSIjN0IyRTJFIiBvcGFjaXR5PSIwLjU1Ii8+PGVsbGlwc2UgY3g9IjIxMS4zIiBjeT0iMTE1LjYiIHJ4PSIxNi4yIiByeT0iMTEuNSIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC4zMSIvPjxlbGxpcHNlIGN4PSIzNjMuNSIgY3k9IjMyNi43IiByeD0iMjUuMSIgcnk9IjE3LjgiIGZpbGw9IiNCNjhBM0YiIG9wYWNpdHk9IjAuNTMiLz48ZWxsaXBzZSBjeD0iMjkwLjMiIGN5PSI3NC4wIiByeD0iMjQuMyIgcnk9IjEyLjQiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuMzAiLz48ZWxsaXBzZSBjeD0iODUuNiIgY3k9IjI2OS4zIiByeD0iMTYuMSIgcnk9IjguMSIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC40NCIvPjxlbGxpcHNlIGN4PSIxNy4zIiBjeT0iNDA4LjkiIHJ4PSIxOC41IiByeT0iOC43IiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjQwIi8+PGVsbGlwc2UgY3g9IjIyMy44IiBjeT0iMjEyLjQiIHJ4PSIyMi4zIiByeT0iMTcuMCIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC4zNyIvPjxlbGxpcHNlIGN4PSIzNjIuMyIgY3k9IjE3Ni4wIiByeD0iMTEuNyIgcnk9IjEzLjkiIGZpbGw9IiM3QjJFMkUiIG9wYWNpdHk9IjAuNTgiLz48ZWxsaXBzZSBjeD0iMTc2LjAiIGN5PSIyNjMuMSIgcng9IjI0LjciIHJ5PSIxNC45IiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjUzIi8+PGVsbGlwc2UgY3g9IjIyOC4xIiBjeT0iMzMwLjgiIHJ4PSIyMy44IiByeT0iOS43IiBmaWxsPSIjNEE1NjM4IiBvcGFjaXR5PSIwLjUwIi8+PGVsbGlwc2UgY3g9IjI4NS41IiBjeT0iMTEwLjMiIHJ4PSIyMC40IiByeT0iMTQuOSIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC40OCIvPjxlbGxpcHNlIGN4PSI0Ny40IiBjeT0iMjI5LjEiIHJ4PSIxNi4xIiByeT0iMTUuMCIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC4zMCIvPjxlbGxpcHNlIGN4PSIyMjYuNCIgY3k9IjM0Mi44IiByeD0iMTMuNiIgcnk9IjE1LjQiIGZpbGw9IiM0QTU2MzgiIG9wYWNpdHk9IjAuMzEiLz48ZWxsaXBzZSBjeD0iMzcuNSIgY3k9IjQ0OS4wIiByeD0iMjIuOCIgcnk9IjguNCIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC40MiIvPjxlbGxpcHNlIGN4PSIzNzYuNSIgY3k9IjQ0MS40IiByeD0iMjIuNCIgcnk9IjguNCIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC40OSIvPjxlbGxpcHNlIGN4PSIzNjcuNyIgY3k9IjEyMS4wIiByeD0iMTIuNSIgcnk9IjguMiIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC41MyIvPjxlbGxpcHNlIGN4PSIzNTIuOSIgY3k9IjQ0LjQiIHJ4PSIxMi4zIiByeT0iMTMuMyIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC40NSIvPjxlbGxpcHNlIGN4PSI0Mi4zIiBjeT0iMzYyLjAiIHJ4PSIyNC4yIiByeT0iMTcuMiIgZmlsbD0iIzdCMkUyRSIgb3BhY2l0eT0iMC4zMiIvPjxlbGxpcHNlIGN4PSIxMS45IiBjeT0iMjk4LjIiIHJ4PSIxMS40IiByeT0iMTMuNiIgZmlsbD0iIzRBNTYzOCIgb3BhY2l0eT0iMC40OCIvPjxlbGxpcHNlIGN4PSIzMTkuOCIgY3k9IjM1LjciIHJ4PSIxMC45IiByeT0iMTMuNSIgZmlsbD0iI0I2OEEzRiIgb3BhY2l0eT0iMC40NCIvPjwvZz4KICA8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQ2MCIgZmlsbD0idXJsKCN2aWcpIi8+CiAgPHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSI0NjAiIGZpbHRlcj0idXJsKCNncmFpbkYpIi8+Cjwvc3ZnPg==" alt="Záhony podél cesty"><span class="archive-cap">Záhony a mulč</span></div>
+      <div class="archive-item"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDAwIDMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBzbGljZSI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxNzFCMTAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMkEzMjIwIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PjxmaWx0ZXIgaWQ9ImJsdXJGIiB4PSItNDAlIiB5PSItNDAlIiB3aWR0aD0iMTgwJSIgaGVpZ2h0PSIxODAlIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSI5Ii8+PC9maWx0ZXI+PGZpbHRlciBpZD0iZ3JhaW5GIiB4PSItMjAlIiB5PSItMjAlIiB3aWR0aD0iMTQwJSIgaGVpZ2h0PSIxNDAlIj4KICAgICAgPGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjEuMCIgbnVtT2N0YXZlcz0iMiIgc2VlZD0iOCIgcmVzdWx0PSJuIi8+CiAgICAgIDxmZUNvbG9yTWF0cml4IGluPSJuIiB0eXBlPSJtYXRyaXgiIHZhbHVlcz0iMCAwIDAgMCAwICAwIDAgMCAwIDAgIDAgMCAwIDAgMCAgMCAwIDAgMC4wNTUgMCIvPgogICAgPC9maWx0ZXI+PHJhZGlhbEdyYWRpZW50IGlkPSJ2aWciIGN4PSI1MCUiIGN5PSI0NiUiIHI9IjcwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iNTUlIiBzdG9wLWNvbG9yPSIjMDAwMDAwIiBzdG9wLW9wYWNpdHk9IjAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDAwMDAwIiBzdG9wLW9wYWNpdHk9IjAuNSIvPgogICAgPC9yYWRpYWxHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9InVybCgjYmcpIi8+CiAgPGcgZmlsdGVyPSJ1cmwoI2JsdXJGKSI+PGVsbGlwc2UgY3g9IjMzLjMiIGN5PSIxNjUuMCIgcng9IjQwLjAiIHJ5PSIxMTQuMCIgZmlsbD0iIzJFMzYyNCIgb3BhY2l0eT0iMC43NSIvPjxlbGxpcHNlIGN4PSIxMDAuMCIgY3k9IjE2NS4wIiByeD0iNDAuMCIgcnk9IjExNC4wIiBmaWxsPSIjMkUzNjI0IiBvcGFjaXR5PSIwLjc1Ii8+PGVsbGlwc2UgY3g9IjE2Ni43IiBjeT0iMTY1LjAiIHJ4PSI0MC4wIiByeT0iMTE0LjAiIGZpbGw9IiMyRTM2MjQiIG9wYWNpdHk9IjAuNzUiLz48ZWxsaXBzZSBjeD0iMjMzLjMiIGN5PSIxNjUuMCIgcng9IjQwLjAiIHJ5PSIxMTQuMCIgZmlsbD0iIzJFMzYyNCIgb3BhY2l0eT0iMC43NSIvPjxlbGxpcHNlIGN4PSIzMDAuMCIgY3k9IjE2NS4wIiByeD0iNDAuMCIgcnk9IjExNC4wIiBmaWxsPSIjMkUzNjI0IiBvcGFjaXR5PSIwLjc1Ii8+PGVsbGlwc2UgY3g9IjM2Ni43IiBjeT0iMTY1LjAiIHJ4PSI0MC4wIiByeT0iMTE0LjAiIGZpbGw9IiMyRTM2MjQiIG9wYWNpdHk9IjAuNzUiLz48ZWxsaXBzZSBjeD0iMTIwLjAiIGN5PSI2MC4wIiByeD0iMTYwLjAiIHJ5PSI2MC4wIiBmaWxsPSIjQjY4QTNGIiBvcGFjaXR5PSIwLjEiLz48L2c+CiAgPHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9InVybCgjdmlnKSIvPgogIDxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWx0ZXI9InVybCgjZ3JhaW5GKSIvPgo8L3N2Zz4=" alt="Živý plot a okraje"><span class="archive-cap">Živé ploty, okraje</span></div>
+      <div class="archive-item"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDAwIDQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBzbGljZSI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxNzFCMTAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMkEzMjIwIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PjxmaWx0ZXIgaWQ9ImJsdXJGIiB4PSItNDAlIiB5PSItNDAlIiB3aWR0aD0iMTgwJSIgaGVpZ2h0PSIxODAlIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSI5Ii8+PC9maWx0ZXI+PGZpbHRlciBpZD0iZ3JhaW5GIiB4PSItMjAlIiB5PSItMjAlIiB3aWR0aD0iMTQwJSIgaGVpZ2h0PSIxNDAlIj4KICAgICAgPGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjEuMCIgbnVtT2N0YXZlcz0iMiIgc2VlZD0iNTc0IiByZXN1bHQ9Im4iLz4KICAgICAgPGZlQ29sb3JNYXRyaXggaW49Im4iIHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDAgIDAgMCAwIDAgMCAgMCAwIDAgMCAwICAwIDAgMCAwLjA1NSAwIi8+CiAgICA8L2ZpbHRlcj48cmFkaWFsR3JhZGllbnQgaWQ9InZpZyIgY3g9IjUwJSIgY3k9IjQ2JSIgcj0iNzAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSI1NSUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+CiAgICA8L3JhZGlhbEdyYWRpZW50PjwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0idXJsKCNiZykiLz4KICA8ZyBmaWx0ZXI9InVybCgjYmx1ckYpIj48ZWxsaXBzZSBjeD0iMjAwLjAiIGN5PSIyNDAuMCIgcng9IjMwIiByeT0iMTgiIGZpbGw9IiMxNTE1MEYiIG9wYWNpdHk9IjAuNiIvPjxlbGxpcHNlIGN4PSIyMDAuMCIgY3k9IjI0MC4wIiByeD0iNzAiIHJ5PSIzNS4wIiBmaWxsPSJub25lIiBzdHJva2U9IiNGM0VFRTEiIHN0cm9rZS13aWR0aD0iNCIgb3BhY2l0eT0iMC4xNiIvPjxlbGxpcHNlIGN4PSIyMDAuMCIgY3k9IjI0MC4wIiByeD0iMTMwIiByeT0iNjUuMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRjNFRUUxIiBzdHJva2Utd2lkdGg9IjQiIG9wYWNpdHk9IjAuMTYiLz48ZWxsaXBzZSBjeD0iMjAwLjAiIGN5PSIyNDAuMCIgcng9IjE5MCIgcnk9Ijk1LjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0YzRUVFMSIgc3Ryb2tlLXdpZHRoPSI0IiBvcGFjaXR5PSIwLjE2Ii8+PC9nPgogIDxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSJ1cmwoI3ZpZykiLz4KICA8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsdGVyPSJ1cmwoI2dyYWluRikiLz4KPC9zdmc+" alt="Zavlažovací systém v trávníku"><span class="archive-cap">Instalace závlahy</span></div>
+      <div class="archive-item"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDAwIDM4MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBzbGljZSI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxNzFCMTAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMkEzMjIwIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PjxmaWx0ZXIgaWQ9ImJsdXJGIiB4PSItNDAlIiB5PSItNDAlIiB3aWR0aD0iMTgwJSIgaGVpZ2h0PSIxODAlIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSI5Ii8+PC9maWx0ZXI+PGZpbHRlciBpZD0iZ3JhaW5GIiB4PSItMjAlIiB5PSItMjAlIiB3aWR0aD0iMTQwJSIgaGVpZ2h0PSIxNDAlIj4KICAgICAgPGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjEuMCIgbnVtT2N0YXZlcz0iMiIgc2VlZD0iNzYzIiByZXN1bHQ9Im4iLz4KICAgICAgPGZlQ29sb3JNYXRyaXggaW49Im4iIHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDAgIDAgMCAwIDAgMCAgMCAwIDAgMCAwICAwIDAgMCAwLjA1NSAwIi8+CiAgICA8L2ZpbHRlcj48cmFkaWFsR3JhZGllbnQgaWQ9InZpZyIgY3g9IjUwJSIgY3k9IjQ2JSIgcj0iNzAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSI1NSUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+CiAgICA8L3JhZGlhbEdyYWRpZW50PjwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjM4MCIgZmlsbD0idXJsKCNiZykiLz4KICA8ZyBmaWx0ZXI9InVybCgjYmx1ckYpIj48cmVjdCB4PSI0OC4wIiB5PSI5NS4wIiB3aWR0aD0iMzA0LjAiIGhlaWdodD0iMjEuMSIgZmlsbD0iIzVDNDUyNyIgb3BhY2l0eT0iMC44Ii8+PHJlY3QgeD0iNDguMCIgeT0iMTIyLjEiIHdpZHRoPSIzMDQuMCIgaGVpZ2h0PSIyMS4xIiBmaWxsPSIjNEEzNjIwIiBvcGFjaXR5PSIwLjgiLz48cmVjdCB4PSI0OC4wIiB5PSIxNDkuMyIgd2lkdGg9IjMwNC4wIiBoZWlnaHQ9IjIxLjEiIGZpbGw9IiM1QzQ1MjciIG9wYWNpdHk9IjAuOCIvPjxyZWN0IHg9IjQ4LjAiIHk9IjE3Ni40IiB3aWR0aD0iMzA0LjAiIGhlaWdodD0iMjEuMSIgZmlsbD0iIzRBMzYyMCIgb3BhY2l0eT0iMC44Ii8+PHJlY3QgeD0iNDguMCIgeT0iMjAzLjYiIHdpZHRoPSIzMDQuMCIgaGVpZ2h0PSIyMS4xIiBmaWxsPSIjNUM0NTI3IiBvcGFjaXR5PSIwLjgiLz48cmVjdCB4PSI0OC4wIiB5PSIyMzAuNyIgd2lkdGg9IjMwNC4wIiBoZWlnaHQ9IjIxLjEiIGZpbGw9IiM0QTM2MjAiIG9wYWNpdHk9IjAuOCIvPjxyZWN0IHg9IjQ4LjAiIHk9IjI1Ny45IiB3aWR0aD0iMzA0LjAiIGhlaWdodD0iMjEuMSIgZmlsbD0iIzVDNDUyNyIgb3BhY2l0eT0iMC44Ii8+PC9nPgogIDxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzgwIiBmaWxsPSJ1cmwoI3ZpZykiLz4KICA8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjM4MCIgZmlsdGVyPSJ1cmwoI2dyYWluRikiLz4KPC9zdmc+" alt="Odvoz zahradního odpadu"><span class="archive-cap">Odvoz odpadu</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CLOSING ============ -->
+<section class="closing">
+  <img class="closing-portrait" id="closingPortrait" src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDIwIDcwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBzbGljZSI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9InJnYmEoMCwwLDAsMCkiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSJyZ2JhKDAsMCwwLDApIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PjxmaWx0ZXIgaWQ9ImJsdXJGIiB4PSItNDAlIiB5PSItNDAlIiB3aWR0aD0iMTgwJSIgaGVpZ2h0PSIxODAlIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxOC45Ii8+PC9maWx0ZXI+PGZpbHRlciBpZD0iZ3JhaW5GIiB4PSItMjAlIiB5PSItMjAlIiB3aWR0aD0iMTQwJSIgaGVpZ2h0PSIxNDAlIj4KICAgICAgPGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjEuMCIgbnVtT2N0YXZlcz0iMiIgc2VlZD0iMzI3IiByZXN1bHQ9Im4iLz4KICAgICAgPGZlQ29sb3JNYXRyaXggaW49Im4iIHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDAgIDAgMCAwIDAgMCAgMCAwIDAgMCAwICAwIDAgMCAwLjAzNSAwIi8+CiAgICA8L2ZpbHRlcj48cmFkaWFsR3JhZGllbnQgaWQ9InZpZyIgY3g9IjUwJSIgY3k9IjQ2JSIgcj0iNzAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSI1NSUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC41Ii8+CiAgICA8L3JhZGlhbEdyYWRpZW50PjwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNDIwIiBoZWlnaHQ9IjcwMCIgZmlsbD0idXJsKCNiZykiLz4KICA8ZyBmaWx0ZXI9InVybCgjYmx1ckYpIj4KICAgICAgPGVsbGlwc2UgY3g9IjIxOC40IiBjeT0iNjg2LjAiIHJ4PSIxMjYuMCIgcnk9IjEyLjYiIGZpbGw9IiMxNTE1MEYiIG9wYWNpdHk9IjAuNCIvPgogICAgICA8ZWxsaXBzZSBjeD0iMjE4LjQiIGN5PSI0MzQuMCIgcng9IjY3LjIiIHJ5PSIyMzguMDAwMDAwMDAwMDAwMDMiIGZpbGw9IiMxRDFEMTUiIG9wYWNpdHk9IjAuODUiLz4KICAgICAgPGVsbGlwc2UgY3g9IjIwMS42IiBjeT0iMTk2LjAwMDAwMDAwMDAwMDAzIiByeD0iMzcuOCIgcnk9Ijg0LjAiIGZpbGw9IiMxRDFEMTUiIG9wYWNpdHk9IjAuODUiLz4KICAgICAgPGVsbGlwc2UgY3g9IjI1Ni4yIiBjeT0iMzUwLjAiIHJ4PSIyMS4wIiByeT0iMTU0LjAiIGZpbGw9IiMyQTJBMUUiIG9wYWNpdHk9IjAuNSIvPgogICAgICA8ZWxsaXBzZSBjeD0iMTYzLjgiIGN5PSIzODUuMDAwMDAwMDAwMDAwMDYiIHJ4PSIyMS4wIiByeT0iMTgyLjAiIGZpbGw9IiNEMkFDNjMiIG9wYWNpdHk9IjAuMTYiLz4KICAgIDwvZz4KICA8cmVjdCB3aWR0aD0iNDIwIiBoZWlnaHQ9IjcwMCIgZmlsbD0idXJsKCN2aWcpIi8+CiAgPHJlY3Qgd2lkdGg9IjQyMCIgaGVpZ2h0PSI3MDAiIGZpbHRlcj0idXJsKCNncmFpbkYpIi8+Cjwvc3ZnPg==" alt="" aria-hidden="true">
+  <div class="wrap">
+    <h2 class="closing-gold" id="closingGold">Zahrada,<br>která má svůj plán.</h2>
+    <div class="closing-actions">
+      <a href="#kontakt" class="btn-primary">Nezávazná poptávka</a>
+      <a href="#plan" class="btn-ghost">Zjistit svůj plán péče</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ KONTAKT ============ -->
+<section class="contact on-cream" id="kontakt">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow on-cream">Kontakt</span>
+      <h2>Popište zahradu, ozveme se s termínem.</h2>
+      <p>Odpovídáme obvykle do 48 hodin.</p>
+    </div>
+
+    <div class="contact-grid reveal">
+      <form class="contact-form" id="contactForm">
+        <div class="field-row">
+          <div class="field">
+            <label for="name">Jméno a příjmení</label>
+            <input type="text" id="name" name="name" required autocomplete="name">
+          </div>
+          <div class="field">
+            <label for="phone">Telefon</label>
+            <input type="tel" id="phone" name="phone" required autocomplete="tel">
+          </div>
+        </div>
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" name="email" required autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="location">Lokalita zahrady</label>
+          <input type="text" id="location" name="location" placeholder="např. Brno-Žabovřesky">
+        </div>
+        <div class="field">
+          <label for="service">Co potřebujete</label>
+          <select id="service" name="service">
+            <option value="mowing">Sekání trávy</option>
+            <option value="mulch">Mulčování</option>
+            <option value="irrigation">Zavlažovací systém</option>
+            <option value="waste">Odvoz zahradního odpadu</option>
+            <option value="combo">Kombinace více služeb</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="message">Popis zahrady a termín</label>
+          <textarea id="message" name="message" rows="4" placeholder="Velikost zahrady, aktuální stav, kdy by se vám termín hodil…"></textarea>
+        </div>
+        <button type="submit" class="submit-btn">Odeslat poptávku</button>
+        <p class="form-note">Poptávka je nezávazná. Ozveme se s termínem prohlídky nebo přímo s nabídkou.</p>
+        <p class="form-status" id="formStatus" role="status">Děkujeme, poptávku máme — ozveme se vám do 48 hodin.</p>
+      </form>
+
+      <div class="contact-info">
+        <div class="info-block">
+          <span>Telefon</span>
+          <a href="tel:+420700000000">+420 700 000 000</a>
+        </div>
+        <div class="info-block">
+          <span>E-mail</span>
+          <a href="mailto:info@posecem.cz">info@posecem.cz</a>
+        </div>
+        <div class="info-block">
+          <span>Působnost</span>
+          <p>Brno a okolí</p>
+        </div>
+        <div class="info-block">
+          <span>Dostupnost</span>
+          <p>Po–Pá, dle sezóny i o víkendech</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2026 PoSečem — péče o zahradu, Brno</span>
+      <span>Sekání trávy · Mulčování · Zavlažovací systémy · Odvoz zahradního odpadu</span>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ============================================================
+   1) PERSPECTIVE CARD STACK — signature interaction (Moment A)
+   Advances 4 cards with rotateY/translateZ perspective transforms,
+   z-order controlled explicitly; resolves into a flat readable
+   result card. Keyboard + pointer accessible, no invented widget
+   logic beyond mapping 3 answers -> 1 of 4 real service plans.
+   ============================================================ */
+(function(){
+  const stage = document.getElementById('stackStage');
+  const cards = Array.from(stage.querySelectorAll('.card'));
+  const dots = Array.from(document.querySelectorAll('#stackProgress .dot'));
+  const backBtn = document.getElementById('stackBack');
+  const restartBtn = document.getElementById('restartStack');
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let current = 0;
+  const answers = {};
+
+  const PLANS = {
+    restore: {
+      title: 'Obnova trávníku',
+      desc: 'Trávník potřebuje spíš péči o kořeny než jen sekání — začneme aerací a přísevem a mulčem, který půdu vyživí.',
+      ritual: 'Na jaře a na podzim provzdušnění trávníku a mulčování jako výživa, mezitím pravidelné sekání, ať se plocha nevrací zpátky do stejného stavu.'
+    },
+    rhythm: {
+      title: 'Pravidelný rytmus',
+      desc: 'Trávník roste rychle a chce hlavně pravidelnost — sekání v cyklu, který mu nedovolí přerůst, a mulčování jako doplněk výživy.',
+      ritual: 'Sekání v intervalu podle růstu (obvykle 7–14 dní) doplněné mulčováním záhonů, aby zbytek zahrady nezaostával.'
+    },
+    irrigation: {
+      title: 'Chytré zavlažování',
+      desc: 'Nerovnoměrná závlaha je nejčastěji otázka rozvržení, ne množství vody — navrhneme a nainstalujeme systém na míru tvaru zahrady.',
+      ritual: 'Instalace automatické závlahy s harmonogramem podle slunce, na podzim odstavení systému, na jaře kontrola a spuštění.'
+    },
+    cleanup: {
+      title: 'Kompletní úklid',
+      desc: 'Sekání i odvoz v rámci jedné návštěvy — posekaná tráva a odpad ze zahrady zmizí, aniž byste je museli řešit sami.',
+      ritual: 'Sekání spojené s okamžitým odvozem posekané trávy a zahradního odpadu při každé návštěvě, mulčování záhonů dvakrát do roka.'
+    }
+  };
+
+  function pickPlan(){
+    const {lawn, sun, pain} = answers;
+    if (pain === 'water') return PLANS.irrigation;
+    if (pain === 'waste') return PLANS.cleanup;
+    if (lawn === 'sparse' || lawn === 'mossy' || lawn === 'new') return PLANS.restore;
+    if (lawn === 'dense' || pain === 'mowing') return PLANS.rhythm;
+    if (sun === 'shade') return PLANS.restore;
+    return PLANS.rhythm;
+  }
+
+  function layout(){
+    cards.forEach((card, i) => {
+      const offset = i - current;
+      card.style.zIndex = 100 - Math.abs(offset);
+      card.setAttribute('aria-hidden', offset === 0 ? 'false' : 'true');
+      // interactive elements inert on non-active cards
+      card.querySelectorAll('button, input, a, select, textarea').forEach(el=>{
+        el.tabIndex = offset === 0 ? 0 : -1;
+      });
+
+      if (prefersReduced){
+        card.style.transition = 'none';
+        card.style.transform = offset === 0 ? 'none' : 'translateX(0)';
+        card.style.opacity = offset === 0 ? '1' : '0';
+        card.style.pointerEvents = offset === 0 ? 'auto' : 'none';
+        return;
+      }
+
+      card.style.transition = 'transform .7s var(--ease), opacity .6s var(--ease)';
+      if (offset === 0){
+        card.style.transform = 'translateX(0) translateZ(0) rotateY(0deg) scale(1)';
+        card.style.opacity = '1';
+        card.style.pointerEvents = 'auto';
+      } else if (offset > 0){
+        // upcoming cards: stacked behind, to the right, tilted
+        const depth = Math.min(offset, 3);
+        card.style.transform = `translateX(${depth*26}px) translateZ(${-depth*90}px) rotateY(-8deg) scale(${1 - depth*0.05})`;
+        card.style.opacity = depth === 1 ? '0.55' : '0';
+        card.style.pointerEvents = 'none';
+      } else {
+        // answered cards: exit to the left, flattened
+        const depth = Math.min(-offset, 3);
+        card.style.transform = `translateX(${-depth*70}px) translateZ(${-depth*60}px) rotateY(6deg) scale(${1 - depth*0.06})`;
+        card.style.opacity = '0';
+        card.style.pointerEvents = 'none';
+      }
+    });
+
+    dots.forEach((d,i)=>{
+      d.classList.toggle('active', i === current);
+      d.classList.toggle('done', i < current);
+    });
+
+    backBtn.hidden = current === 0;
+
+    if (current === 3){
+      const plan = pickPlan();
+      document.getElementById('resultPlan').textContent = plan.title;
+      document.getElementById('resultDesc').textContent = plan.desc;
+      document.getElementById('resultRitual').textContent = plan.ritual;
+      document.getElementById('resultCta').textContent = 'Nezávazná poptávka — ' + plan.title;
+    }
+  }
+
+  function goTo(step){
+    current = Math.max(0, Math.min(cards.length - 1, step));
+    layout();
+    if (current === cards.length - 1){
+      const liveCard = cards[current];
+      liveCard.focus?.();
+    }
+  }
+
+  cards.forEach(card=>{
+    card.querySelectorAll('.card-option').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const group = btn.parentElement;
+        const q = group.dataset.q;
+        group.querySelectorAll('.card-option').forEach(o=>o.setAttribute('aria-pressed','false'));
+        btn.setAttribute('aria-pressed','true');
+        answers[q] = btn.dataset.v;
+        setTimeout(()=>goTo(current+1), 260);
+      });
+    });
+  });
+
+  backBtn.addEventListener('click', ()=>goTo(current-1));
+  restartBtn.addEventListener('click', ()=>{
+    Object.keys(answers).forEach(k=>delete answers[k]);
+    stage.querySelectorAll('.card-option').forEach(o=>o.setAttribute('aria-pressed','false'));
+    goTo(0);
+  });
+
+  layout();
+})();
+
+/* ============================================================
+   2) HERO BOWED RIBBON PARALLAX (Moment B)
+   Ribbon translates x:8vw -> -18vw over 180vh of scroll; portrait
+   counter-shifts x:-2vw -> 2vw at 0.45x speed. Role/signature
+   reveal fades in after the ribbon settles. Flattens under
+   reduced motion and on small screens (handled in CSS + guard below).
+   ============================================================ */
+(function(){
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isSmall = window.matchMedia('(max-width: 760px)').matches;
+  if (prefersReduced || isSmall || !window.gsap) {
+    document.getElementById('heroRole').style.opacity = '1';
+    document.getElementById('heroRole').style.transform = 'none';
+    return;
+  }
+  gsap.registerPlugin(ScrollTrigger);
+
+  const tl = gsap.timeline({
+    scrollTrigger:{
+      trigger: '.hero',
+      start: 'top top',
+      end: '+=180%',
+      scrub: 0.6
+    }
+  });
+
+  tl.fromTo('#ribbonLayer',
+    { xPercent: 0, x: '8vw' },
+    { x: '-18vw', ease:'none' }, 0
+  );
+  tl.fromTo('#portraitLayer',
+    { x: '-2vw' },
+    { x: '2vw', ease:'none' }, 0
+  );
+  tl.to('#heroRole', { opacity:1, y:0, duration:0.3 }, 0.72);
+
+  /* Closing section: gold statement rises behind the anchored portrait */
+  gsap.fromTo('#closingGold',
+    { y: 60, opacity: 0.4 },
+    {
+      y: 0, opacity: 1, ease:'none',
+      scrollTrigger:{
+        trigger: '.closing',
+        start: 'top 85%',
+        end: 'top 30%',
+        scrub: 0.6
+      }
+    }
+  );
+})();
+
+/* ============================================================
+   3) Simple reveal-on-scroll for all remaining sections
+   (kept intentionally plain per the level's execution budget)
+   ============================================================ */
+(function(){
+  const items = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window)) { items.forEach(i=>i.classList.add('in')); return; }
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.15 });
+  items.forEach(i=>io.observe(i));
+})();
+
+/* Counting figures (facts strip) */
+(function(){
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const nums = document.querySelectorAll('.fact-num');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if (!e.isIntersecting) return;
+      const el = e.target;
+      const target = parseInt(el.dataset.count, 10);
+      const suffix = el.dataset.suffix || '';
+      io.unobserve(el);
+      if (prefersReduced || target === 0){ el.textContent = target + suffix; return; }
+      let start = null;
+      const dur = 900;
+      function step(ts){
+        if (!start) start = ts;
+        const p = Math.min((ts-start)/dur, 1);
+        el.textContent = Math.round(p*target) + suffix;
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }, { threshold: 0.4 });
+  nums.forEach(n=>io.observe(n));
+})();
+
+/* Contact form (static demo submit — no backend wired) */
+(function(){
+  const form = document.getElementById('contactForm');
+  const status = document.getElementById('formStatus');
+  form.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    status.classList.add('show');
+    form.querySelector('.submit-btn').textContent = 'Odesláno';
+  });
+})();
+</script>
+</body>
+</html>
